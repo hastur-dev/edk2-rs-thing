@@ -12,13 +12,38 @@ A BSD-2-Clause-Patent licensed implementation of Rust support for UEFI firmware 
 
 ## Quick Start
 
+### Prerequisites
+
+- Rust nightly toolchain (`nightly-2025-01-09` or compatible)
+- `x86_64-unknown-uefi` target installed
+
+### Setup
+
 ```bash
+# Install the required Rust toolchain
+rustup toolchain install nightly-2025-01-09
+
+# Add the UEFI target
+rustup target add x86_64-unknown-uefi --toolchain nightly-2025-01-09
+
+# Add rust-src component for building std library components
+rustup component add rust-src --toolchain nightly-2025-01-09
+```
+
+### Building
+
+```bash
+# Build the library (recommended first to verify setup)
+cargo build --lib
+
 # Build the UEFI application
 cargo build --release
 
 # The output will be at:
 # target/x86_64-unknown-uefi/release/uefi-app.efi
 ```
+
+**Note**: The library currently builds successfully. Example binaries may have errors that need to be addressed.
 
 ## Example
 

@@ -308,19 +308,20 @@ pub mod unwind {
 
 /// Rust-specific compiler intrinsics
 pub mod rust {
-    /// Called when attempting to panic from a function marked as `nounwind`
+    // Called when attempting to panic from a function marked as `nounwind`
     // Note: rust_begin_unwind is now provided by the panic handler
     // #[no_mangle]
     // pub extern "C" fn rust_begin_unwind(_info: &core::panic::PanicInfo) -> ! {
     //     loop {}
     // }
 
-    /// Called for debug assertions that fail
-    #[cfg(debug_assertions)]
-    #[no_mangle]
-    pub extern "C" fn __rust_probestack() {
-        // No-op in UEFI
-    }
+    // Called for debug assertions that fail
+    // Note: __rust_probestack is now provided by compiler_builtins
+    // #[cfg(debug_assertions)]
+    // #[no_mangle]
+    // pub extern "C" fn __rust_probestack() {
+    //     // No-op in UEFI
+    // }
 }
 
 /// Architecture-specific intrinsics
