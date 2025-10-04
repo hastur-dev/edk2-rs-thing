@@ -2,6 +2,7 @@
 //! UEFI Driver Binding Protocol - Driver Model Support
 
 use crate::ffi::*;
+use alloc::vec::Vec;
 
 /// EFI_DRIVER_BINDING_PROTOCOL_GUID
 pub const DRIVER_BINDING_PROTOCOL_GUID: Guid = Guid::new(

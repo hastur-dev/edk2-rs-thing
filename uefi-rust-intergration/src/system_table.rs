@@ -5,6 +5,8 @@ use crate::ffi::*;
 use crate::boot_services::BootServices;
 use crate::runtime_services::RuntimeServices;
 
+pub use crate::tables::configuration::ConfigurationTable;
+
 /// Simple Text Output Protocol (minimal definition)
 #[repr(C)]
 pub struct SimpleTextOutputProtocol {
@@ -18,14 +20,6 @@ pub struct SimpleTextOutputProtocol {
 pub struct SimpleTextInputProtocol {
     pub reset: unsafe extern "efiapi" fn(this: *mut SimpleTextInputProtocol, extended_verification: Boolean) -> Status,
     // Additional fields omitted for brevity
-}
-
-/// EFI Configuration Table
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ConfigurationTable {
-    pub vendor_guid: Guid,
-    pub vendor_table: *mut core::ffi::c_void,
 }
 
 /// EFI System Table

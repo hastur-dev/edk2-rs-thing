@@ -9,33 +9,7 @@ pub mod time;
 
 pub use safe_wrappers::RuntimeServicesWrapper;
 pub use variables::*;
-pub use time::{TimeService, TimeCapabilities as TimeCapabilitiesExt};
-
-/// EFI_TIME structure
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Time {
-    pub year: Uint16,
-    pub month: Uint8,
-    pub day: Uint8,
-    pub hour: Uint8,
-    pub minute: Uint8,
-    pub second: Uint8,
-    pub pad1: Uint8,
-    pub nanosecond: Uint32,
-    pub time_zone: Int16,
-    pub daylight: Uint8,
-    pub pad2: Uint8,
-}
-
-/// EFI_TIME_CAPABILITIES
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TimeCapabilities {
-    pub resolution: Uint32,
-    pub accuracy: Uint32,
-    pub sets_to_zero: Boolean,
-}
+pub use time::{TimeService, Time, TimeCapabilities};
 
 /// EFI_RESET_TYPE
 #[repr(u32)]

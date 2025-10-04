@@ -4,6 +4,7 @@
 //! The HII Database is used for managing strings, fonts, forms, keyboards, and images.
 
 use crate::ffi::*;
+use crate::runtime_services::Time;
 
 /// EFI_HII_DATABASE_PROTOCOL_GUID
 pub const HII_DATABASE_PROTOCOL_GUID: Guid = Guid::new(
@@ -381,8 +382,8 @@ pub union HiiConfigAccessValue {
     pub u32_value: Uint32,
     pub u64_value: Uint64,
     pub bool_value: Boolean,
-    pub time_value: crate::ffi::Time,
-    pub date_value: crate::ffi::Time,
+    pub time_value: Time,
+    pub date_value: Time,
     pub string_value: StringId,
     pub buffer: *mut core::ffi::c_void,
 }

@@ -2,6 +2,7 @@
 //! UEFI Firmware Management Protocol
 
 use crate::ffi::*;
+use alloc::vec::Vec;
 
 /// EFI_FIRMWARE_MANAGEMENT_PROTOCOL_GUID
 pub const FIRMWARE_MANAGEMENT_PROTOCOL_GUID: Guid = Guid::new(

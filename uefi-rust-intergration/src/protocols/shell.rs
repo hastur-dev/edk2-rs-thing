@@ -5,6 +5,7 @@
 //! applications to interact with the UEFI Shell environment.
 
 use crate::ffi::*;
+use crate::runtime_services::Time;
 
 /// EFI_SHELL_PROTOCOL_GUID
 pub const SHELL_PROTOCOL_GUID: Guid = Guid::new(
@@ -244,8 +245,9 @@ impl ShellProtocol {
         command: &[u16],
     ) -> Result<Status, Status> {
         let mut status_code = EFI_SUCCESS;
+        let handle_ptr = parent_handle.as_ptr() as *mut Handle;
         let result = (self.execute)(
-            parent_handle as *mut _,
+            handle_ptr,
             command.as_ptr() as *const _,
             core::ptr::null_mut(),
             &mut status_code,

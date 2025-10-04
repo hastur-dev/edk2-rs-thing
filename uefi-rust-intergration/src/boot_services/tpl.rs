@@ -2,6 +2,7 @@
 //! Task Priority Level (TPL) Management Utilities
 
 use crate::ffi::*;
+use crate::boot_services::BootServices;
 
 /// Task Priority Levels
 pub const TPL_APPLICATION: Tpl = 4;

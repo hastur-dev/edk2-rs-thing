@@ -3,6 +3,7 @@
 
 use crate::ffi::*;
 use crate::protocols::tcp_udp::{Ipv4Address, Ipv6Address};
+use crate::runtime_services::Time;
 
 /// EFI_IP4_SERVICE_BINDING_PROTOCOL_GUID
 pub const IP4_SERVICE_BINDING_PROTOCOL_GUID: Guid = Guid::new(

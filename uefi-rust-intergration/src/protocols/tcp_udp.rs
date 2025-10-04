@@ -2,6 +2,7 @@
 //! UEFI TCP/UDP Protocol - Network Transport Layer
 
 use crate::ffi::*;
+use crate::runtime_services::Time;
 
 /// EFI_TCP4_SERVICE_BINDING_PROTOCOL_GUID
 pub const TCP4_SERVICE_BINDING_PROTOCOL_GUID: Guid = Guid::new(

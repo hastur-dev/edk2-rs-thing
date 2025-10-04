@@ -281,6 +281,7 @@ pub const CERT_X509_GUID: Guid = Guid::new(
 pub mod secure_boot {
     use super::*;
     use crate::runtime_services::Variable;
+    use crate::runtime_services::EFI_IMAGE_SECURITY_DATABASE_GUID;
 
     /// Check if Secure Boot is enabled
     pub unsafe fn is_secure_boot_enabled(vars: &Variable) -> bool {
@@ -303,7 +304,7 @@ pub mod secure_boot {
     ) -> Result<(u32, usize), Status> {
         vars.get(
             PLATFORM_KEY_VARIABLE.as_ptr(),
-            &crate::tables::acpi::EFI_IMAGE_SECURITY_DATABASE_GUID,
+            &EFI_IMAGE_SECURITY_DATABASE_GUID,
             buffer,
         )
     }

@@ -44,6 +44,9 @@ pub struct RsdpDescriptor20 {
     pub reserved: [u8; 3],
 }
 
+/// Type alias for RSDP (uses ACPI 2.0+ structure)
+pub type Rsdp = RsdpDescriptor20;
+
 /// ACPI Table Header
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
