@@ -50,8 +50,9 @@ pub mod mem {
     }
 
     /// memcmp implementation
-    #[no_mangle]
-    pub unsafe extern "C" fn memcmp(s1: *const u8, s2: *const u8, n: usize) -> i32 {
+    // Note: memcmp is now provided by compiler_builtins
+    // #[no_mangle]
+    // pub unsafe extern "C" fn memcmp(s1: *const u8, s2: *const u8, n: usize) -> i32 {
         let mut i = 0;
         while i < n {
             let a = *s1.add(i);
