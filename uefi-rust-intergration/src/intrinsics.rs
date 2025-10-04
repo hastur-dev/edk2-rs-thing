@@ -7,47 +7,50 @@
 /// Memory operations intrinsics
 pub mod mem {
     /// memcpy implementation
-    #[no_mangle]
-    pub unsafe extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
-        let mut i = 0;
-        while i < n {
-            *dest.add(i) = *src.add(i);
-            i += 1;
-        }
-        dest
-    }
+    // Note: memcpy is now provided by compiler_builtins
+    // #[no_mangle]
+    // pub unsafe extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
+    //     let mut i = 0;
+    //     while i < n {
+    //         *dest.add(i) = *src.add(i);
+    //         i += 1;
+    //     }
+    //     dest
+    // }
 
     /// memmove implementation (handles overlapping memory)
-    #[no_mangle]
-    pub unsafe extern "C" fn memmove(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
-        if src < dest as *const u8 {
-            // Copy backwards to handle overlap
-            let mut i = n;
-            while i != 0 {
-                i -= 1;
-                *dest.add(i) = *src.add(i);
-            }
-        } else {
-            // Copy forwards
-            let mut i = 0;
-            while i < n {
-                *dest.add(i) = *src.add(i);
-                i += 1;
-            }
-        }
-        dest
-    }
+    // Note: memmove is now provided by compiler_builtins
+    // #[no_mangle]
+    // pub unsafe extern "C" fn memmove(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
+    //     if src < dest as *const u8 {
+    //         // Copy backwards to handle overlap
+    //         let mut i = n;
+    //         while i != 0 {
+    //             i -= 1;
+    //             *dest.add(i) = *src.add(i);
+    //         }
+    //     } else {
+    //         // Copy forwards
+    //         let mut i = 0;
+    //         while i < n {
+    //             *dest.add(i) = *src.add(i);
+    //             i += 1;
+    //         }
+    //     }
+    //     dest
+    // }
 
     /// memset implementation
-    #[no_mangle]
-    pub unsafe extern "C" fn memset(s: *mut u8, c: i32, n: usize) -> *mut u8 {
-        let mut i = 0;
-        while i < n {
-            *s.add(i) = c as u8;
-            i += 1;
-        }
-        s
-    }
+    // Note: memset is now provided by compiler_builtins
+    // #[no_mangle]
+    // pub unsafe extern "C" fn memset(s: *mut u8, c: i32, n: usize) -> *mut u8 {
+    //     let mut i = 0;
+    //     while i < n {
+    //         *s.add(i) = c as u8;
+    //         i += 1;
+    //     }
+    //     s
+    // }
 
     /// memcmp implementation
     // Note: memcmp is now provided by compiler_builtins
@@ -306,10 +309,11 @@ pub mod unwind {
 /// Rust-specific compiler intrinsics
 pub mod rust {
     /// Called when attempting to panic from a function marked as `nounwind`
-    #[no_mangle]
-    pub extern "C" fn rust_begin_unwind(_info: &core::panic::PanicInfo) -> ! {
-        loop {}
-    }
+    // Note: rust_begin_unwind is now provided by the panic handler
+    // #[no_mangle]
+    // pub extern "C" fn rust_begin_unwind(_info: &core::panic::PanicInfo) -> ! {
+    //     loop {}
+    // }
 
     /// Called for debug assertions that fail
     #[cfg(debug_assertions)]
