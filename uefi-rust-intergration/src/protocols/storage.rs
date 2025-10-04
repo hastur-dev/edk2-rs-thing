@@ -364,8 +364,8 @@ pub struct PartitionInfo {
 /// Partition Info Union
 #[repr(C)]
 pub union PartitionInfoUnion {
-    pub mbr: MbrPartitionRecord,
-    pub gpt: GptPartitionEntry,
+    pub mbr: core::mem::ManuallyDrop<MbrPartitionRecord>,
+    pub gpt: core::mem::ManuallyDrop<GptPartitionEntry>,
 }
 
 /// EFI_PARTITION_INFO_PROTOCOL

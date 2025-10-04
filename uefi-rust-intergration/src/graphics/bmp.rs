@@ -3,6 +3,7 @@
 
 use crate::ffi::*;
 use crate::protocols::graphics_output::*;
+use alloc::vec::Vec;
 
 /// BMP File Header
 #[repr(C, packed)]
