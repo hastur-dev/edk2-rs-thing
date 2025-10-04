@@ -1,0 +1,2 @@
+# Cargo config for running tests on host platform
+# Tests don't target UEFI, they run natively

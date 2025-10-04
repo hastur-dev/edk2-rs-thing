@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        toolchain: nightly
+        components: rust-src
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo build
+      uses: actions/cache@v4
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run tests
+      run: cargo test --tests --features std --verbose -- --test-threads=1
+
+  build-uefi:
+    name: Build UEFI Application
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        toolchain: nightly
+        components: rust-src
+
+    - name: Restore cargo config for UEFI
+      run: |
+        if [ -f .cargo/config.toml.uefi ]; then
+          mv .cargo/config.toml.uefi .cargo/config.toml
+        fi
+
+    - name: Build UEFI application
+      run: cargo build --release --verbose
+
+    - name: Check binary exists
+      run: ls -lh target/x86_64-unknown-uefi/release/uefi-app.efi
+
+    - name: Upload UEFI binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: uefi-app
+        path: target/x86_64-unknown-uefi/release/uefi-app.efi
+
+  clippy:
+    name: Clippy Lints
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        toolchain: nightly
+        components: clippy
+
+    - name: Run clippy
+      run: cargo clippy --tests -- -D warnings
+      continue-on-error: true
+
+  fmt:
+    name: Code Formatting
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        toolchain: nightly
+        components: rustfmt
+
+    - name: Check formatting
+      run: cargo fmt -- --check
+      continue-on-error: true
