@@ -2,7 +2,12 @@
 //! UEFI Firmware Management Protocol
 
 use crate::ffi::*;
+
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::vec::Vec;
 
 /// EFI_FIRMWARE_MANAGEMENT_PROTOCOL_GUID
 pub const FIRMWARE_MANAGEMENT_PROTOCOL_GUID: Guid = Guid::new(
@@ -214,11 +219,7 @@ impl FirmwareManagementProtocol {
     }
 
     /// Check if an image is valid for update
-    pub unsafe fn check_image(
-        &mut self,
-        image_index: u8,
-        image: &[u8],
-    ) -> Result<u32, Status> {
+    pub unsafe fn check_image(&mut self, image_index: u8, image: &[u8]) -> Result<u32, Status> {
         let mut image_updatable = 0u32;
 
         let status = (self.check_image)(

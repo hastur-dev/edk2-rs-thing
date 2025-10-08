@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! Advanced ACPI Table Utilities and SDT Support
 
-use crate::ffi::*;
 use crate::tables::acpi::*;
 
 /// ACPI SDT (System Description Table) Header
@@ -200,10 +199,10 @@ pub struct AcpiTableIterator<'a> {
 impl<'a> AcpiTableIterator<'a> {
     /// Create a new ACPI table iterator from RSDT
     pub unsafe fn from_rsdt(rsdt: &'a Rsdt) -> Self {
-        let start = rsdt as *const _ as *const u8;
-        let header_size = core::mem::size_of::<Rsdt>();
-        let table_start = start.add(header_size) as *const u32;
-        let table_count = (rsdt.header.length as usize - header_size) / 4;
+        let _start = rsdt as *const _ as *const u8;
+        let _header_size = core::mem::size_of::<Rsdt>();
+        let _table_start = _start.add(_header_size) as *const u32;
+        let _table_count = (rsdt.header.length as usize - _header_size) / 4;
 
         // This is simplified - in reality we'd iterate through the table entries
         AcpiTableIterator {
@@ -215,8 +214,8 @@ impl<'a> AcpiTableIterator<'a> {
 
     /// Create a new ACPI table iterator from XSDT
     pub unsafe fn from_xsdt(xsdt: &'a Xsdt) -> Self {
-        let start = xsdt as *const _ as *const u8;
-        let header_size = core::mem::size_of::<Xsdt>();
+        let _start = xsdt as *const _ as *const u8;
+        let _header_size = core::mem::size_of::<Xsdt>();
 
         AcpiTableIterator {
             current_ptr: core::ptr::null(),
@@ -251,10 +250,7 @@ pub struct AcpiTableFinder;
 
 impl AcpiTableFinder {
     /// Find a table by signature
-    pub unsafe fn find_table<'a>(
-        rsdp: &'a Rsdp,
-        signature: &[u8; 4],
-    ) -> Option<&'a AcpiSdtHeader> {
+    pub unsafe fn find_table<'a>(rsdp: &'a Rsdp, signature: &[u8; 4]) -> Option<&'a AcpiSdtHeader> {
         if rsdp.revision >= 2 {
             // Use XSDT
             let xsdt_ptr = rsdp.xsdt_address as *const Xsdt;
@@ -341,7 +337,8 @@ pub mod mcfg_helpers {
         let entry_size = core::mem::size_of::<McfgConfigSpaceEntry>();
         let entry_count = (mcfg.header.length as usize - header_size) / entry_size;
 
-        let entries_ptr = (mcfg as *const _ as *const u8).add(header_size) as *const McfgConfigSpaceEntry;
+        let entries_ptr =
+            (mcfg as *const _ as *const u8).add(header_size) as *const McfgConfigSpaceEntry;
         core::slice::from_raw_parts(entries_ptr, entry_count)
     }
 

@@ -4,13 +4,13 @@
 #![cfg(test)]
 #![allow(dead_code)]
 
-use uefi_rust_intergration::ffi::*;
-use uefi_rust_intergration::boot_services::*;
-use uefi_rust_intergration::runtime_services::*;
-use uefi_rust_intergration::system_table::*;
 use core::ptr::null_mut;
 use std::collections::HashMap;
 use std::sync::Mutex;
+use uefi_rust_intergration::boot_services::*;
+use uefi_rust_intergration::ffi::*;
+use uefi_rust_intergration::runtime_services::*;
+use uefi_rust_intergration::system_table::*;
 
 /// Mock memory pool for testing allocator
 static MOCK_POOL: Mutex<Option<HashMap<usize, Vec<u8>>>> = Mutex::new(None);
@@ -212,28 +212,42 @@ pub fn create_mock_boot_services() -> BootServices {
         signal_event: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         close_event: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         check_event: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
-        install_protocol_interface: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
-        reinstall_protocol_interface: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
-        uninstall_protocol_interface: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
+        install_protocol_interface: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
+        reinstall_protocol_interface: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
+        uninstall_protocol_interface: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
         handle_protocol: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         reserved: null_mut(),
-        register_protocol_notify: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
+        register_protocol_notify: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
         locate_handle: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         locate_device_path: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
-        install_configuration_table: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
+        install_configuration_table: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
         load_image: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         start_image: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         exit: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         unload_image: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         exit_boot_services: mock_exit_boot_services,
-        get_next_monotonic_count: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
+        get_next_monotonic_count: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
         stall: mock_stall,
         set_watchdog_timer: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         connect_controller: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         disconnect_controller: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         open_protocol: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         close_protocol: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
-        open_protocol_information: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
+        open_protocol_information: unsafe {
+            core::mem::transmute(stub_not_implemented as *const ())
+        },
         protocols_per_handle: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         locate_handle_buffer: unsafe { core::mem::transmute(stub_not_implemented as *const ()) },
         locate_protocol: mock_locate_protocol,

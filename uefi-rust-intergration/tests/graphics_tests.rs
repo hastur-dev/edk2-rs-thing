@@ -100,19 +100,19 @@ fn test_bmp_row_padding_examples() {
 fn test_bmp_error_types() {
     let err = BmpError::InvalidSignature;
     match err {
-        BmpError::InvalidSignature => {},
+        BmpError::InvalidSignature => {}
         _ => panic!("Wrong error type"),
     }
 
     let err = BmpError::InvalidHeader;
     match err {
-        BmpError::InvalidHeader => {},
+        BmpError::InvalidHeader => {}
         _ => panic!("Wrong error type"),
     }
 
     let err = BmpError::UnsupportedFormat;
     match err {
-        BmpError::UnsupportedFormat => {},
+        BmpError::UnsupportedFormat => {}
         _ => panic!("Wrong error type"),
     }
 }

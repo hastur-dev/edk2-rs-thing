@@ -153,9 +153,7 @@ pub struct PciIoProtocol {
         pages: Uintn,
         host_address: *mut core::ffi::c_void,
     ) -> Status,
-    pub flush: unsafe extern "efiapi" fn(
-        this: *mut PciIoProtocol,
-    ) -> Status,
+    pub flush: unsafe extern "efiapi" fn(this: *mut PciIoProtocol) -> Status,
     pub get_location: unsafe extern "efiapi" fn(
         this: *mut PciIoProtocol,
         segment_number: *mut Uintn,
@@ -202,23 +200,13 @@ impl PciIoProtocol {
     }
 
     /// Read from PCI configuration space
-    pub unsafe fn pci_read(
-        &mut self,
-        width: PciIoWidth,
-        offset: u32,
-        buffer: &mut [u8],
-    ) -> Status {
+    pub unsafe fn pci_read(&mut self, width: PciIoWidth, offset: u32, buffer: &mut [u8]) -> Status {
         let count = buffer.len() / (width as usize + 1);
         (self.pci.read)(self, width, offset, count, buffer.as_mut_ptr() as *mut _)
     }
 
     /// Write to PCI configuration space
-    pub unsafe fn pci_write(
-        &mut self,
-        width: PciIoWidth,
-        offset: u32,
-        buffer: &[u8],
-    ) -> Status {
+    pub unsafe fn pci_write(&mut self, width: PciIoWidth, offset: u32, buffer: &[u8]) -> Status {
         let count = buffer.len() / (width as usize + 1);
         (self.pci.write)(self, width, offset, count, buffer.as_ptr() as *mut _)
     }

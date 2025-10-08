@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! EFI System Table
 
-use crate::ffi::*;
 use crate::boot_services::BootServices;
+use crate::ffi::*;
 use crate::runtime_services::RuntimeServices;
 
 pub use crate::tables::configuration::ConfigurationTable;
@@ -10,15 +10,24 @@ pub use crate::tables::configuration::ConfigurationTable;
 /// Simple Text Output Protocol (minimal definition)
 #[repr(C)]
 pub struct SimpleTextOutputProtocol {
-    pub reset: unsafe extern "efiapi" fn(this: *mut SimpleTextOutputProtocol, extended_verification: Boolean) -> Status,
-    pub output_string: unsafe extern "efiapi" fn(this: *mut SimpleTextOutputProtocol, string: *const Char16) -> Status,
+    pub reset: unsafe extern "efiapi" fn(
+        this: *mut SimpleTextOutputProtocol,
+        extended_verification: Boolean,
+    ) -> Status,
+    pub output_string: unsafe extern "efiapi" fn(
+        this: *mut SimpleTextOutputProtocol,
+        string: *const Char16,
+    ) -> Status,
     // Additional fields omitted for brevity
 }
 
 /// Simple Text Input Protocol (minimal definition)
 #[repr(C)]
 pub struct SimpleTextInputProtocol {
-    pub reset: unsafe extern "efiapi" fn(this: *mut SimpleTextInputProtocol, extended_verification: Boolean) -> Status,
+    pub reset: unsafe extern "efiapi" fn(
+        this: *mut SimpleTextInputProtocol,
+        extended_verification: Boolean,
+    ) -> Status,
     // Additional fields omitted for brevity
 }
 

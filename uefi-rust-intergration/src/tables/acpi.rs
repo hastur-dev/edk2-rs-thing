@@ -22,7 +22,7 @@ pub const ACPI_20_TABLE_GUID: Guid = Guid::new(
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct RsdpDescriptor10 {
-    pub signature: [u8; 8],     // "RSD PTR "
+    pub signature: [u8; 8], // "RSD PTR "
     pub checksum: u8,
     pub oem_id: [u8; 6],
     pub revision: u8,
@@ -33,7 +33,7 @@ pub struct RsdpDescriptor10 {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct RsdpDescriptor20 {
-    pub signature: [u8; 8],     // "RSD PTR "
+    pub signature: [u8; 8], // "RSD PTR "
     pub checksum: u8,
     pub oem_id: [u8; 6],
     pub revision: u8,
@@ -166,10 +166,7 @@ impl RsdpDescriptor20 {
     /// Verify RSDP 2.0+ extended checksum
     pub fn verify_checksum(&self) -> bool {
         let bytes = unsafe {
-            core::slice::from_raw_parts(
-                self as *const _ as *const u8,
-                self.length as usize,
-            )
+            core::slice::from_raw_parts(self as *const _ as *const u8, self.length as usize)
         };
 
         let sum: u8 = bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
@@ -186,10 +183,7 @@ impl AcpiTableHeader {
     /// Verify table checksum
     pub fn verify_checksum(&self) -> bool {
         let bytes = unsafe {
-            core::slice::from_raw_parts(
-                self as *const _ as *const u8,
-                self.length as usize,
-            )
+            core::slice::from_raw_parts(self as *const _ as *const u8, self.length as usize)
         };
 
         let sum: u8 = bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
@@ -214,7 +208,8 @@ impl Rsdt {
             return None;
         }
 
-        let entries = (self as *const _ as usize + core::mem::size_of::<AcpiTableHeader>()) as *const u32;
+        let entries =
+            (self as *const _ as usize + core::mem::size_of::<AcpiTableHeader>()) as *const u32;
         Some(*entries.add(index))
     }
 }
@@ -231,7 +226,8 @@ impl Xsdt {
             return None;
         }
 
-        let entries = (self as *const _ as usize + core::mem::size_of::<AcpiTableHeader>()) as *const u64;
+        let entries =
+            (self as *const _ as usize + core::mem::size_of::<AcpiTableHeader>()) as *const u64;
         Some(*entries.add(index))
     }
 }

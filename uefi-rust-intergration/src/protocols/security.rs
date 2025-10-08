@@ -209,33 +209,33 @@ impl Pkcs7VerifyProtocol {
 
 /// EFI_IMAGE_SECURITY_DATABASE Variable Name
 pub const IMAGE_SECURITY_DATABASE_VARIABLE: &[u16] = &[
-    0x0064, 0x0062, 0x0000  // "db\0"
+    0x0064, 0x0062, 0x0000, // "db\0"
 ];
 
 /// EFI_IMAGE_SECURITY_DATABASE1 Variable Name
 pub const IMAGE_SECURITY_DATABASE1_VARIABLE: &[u16] = &[
-    0x0064, 0x0062, 0x0078, 0x0000  // "dbx\0"
+    0x0064, 0x0062, 0x0078, 0x0000, // "dbx\0"
 ];
 
 /// EFI_IMAGE_SECURITY_DATABASE2 Variable Name
 pub const IMAGE_SECURITY_DATABASE2_VARIABLE: &[u16] = &[
-    0x0064, 0x0062, 0x0074, 0x0000  // "dbt\0"
+    0x0064, 0x0062, 0x0074, 0x0000, // "dbt\0"
 ];
 
 /// Platform Key Variable Name
 pub const PLATFORM_KEY_VARIABLE: &[u16] = &[
-    0x0050, 0x004B, 0x0000  // "PK\0"
+    0x0050, 0x004B, 0x0000, // "PK\0"
 ];
 
 /// Key Exchange Key Variable Name
 pub const KEY_EXCHANGE_KEY_VARIABLE: &[u16] = &[
-    0x004B, 0x0045, 0x004B, 0x0000  // "KEK\0"
+    0x004B, 0x0045, 0x004B, 0x0000, // "KEK\0"
 ];
 
 /// Secure Boot Mode Variable Name
 pub const SECURE_BOOT_MODE_VARIABLE: &[u16] = &[
-    0x0053, 0x0065, 0x0063, 0x0075, 0x0072, 0x0065, 0x0042, 0x006F,
-    0x006F, 0x0074, 0x0000  // "SecureBoot\0"
+    0x0053, 0x0065, 0x0063, 0x0075, 0x0072, 0x0065, 0x0042, 0x006F, 0x006F, 0x0074,
+    0x0000, // "SecureBoot\0"
 ];
 
 /// EFI_SIGNATURE_DATA
@@ -299,10 +299,8 @@ pub type Tpm2SubmitCommand = unsafe extern "efiapi" fn(
 ) -> Status;
 
 /// TPM2 Get Active PCR Banks
-pub type Tpm2GetActivePcrBanks = unsafe extern "efiapi" fn(
-    this: *mut Tpm2Protocol,
-    active_pcr_banks: *mut Uint32,
-) -> Status;
+pub type Tpm2GetActivePcrBanks =
+    unsafe extern "efiapi" fn(this: *mut Tpm2Protocol, active_pcr_banks: *mut Uint32) -> Status;
 
 /// EFI_TPM2_PROTOCOL
 #[repr(C)]
@@ -408,7 +406,9 @@ pub mod secure_boot {
 
     /// Check if system is in Setup Mode
     pub unsafe fn is_setup_mode(vars: &Variable) -> bool {
-        let setup_mode_var: &[u16] = &[0x0053, 0x0065, 0x0074, 0x0075, 0x0070, 0x004D, 0x006F, 0x0064, 0x0065, 0x0000]; // "SetupMode\0"
+        let setup_mode_var: &[u16] = &[
+            0x0053, 0x0065, 0x0074, 0x0075, 0x0070, 0x004D, 0x006F, 0x0064, 0x0065, 0x0000,
+        ]; // "SetupMode\0"
         let mut buffer = [0u8; 1];
         if let Ok((_, size)) = vars.get(
             setup_mode_var.as_ptr(),
@@ -434,10 +434,7 @@ pub mod secure_boot {
     }
 
     /// Get Key Exchange Keys (KEK)
-    pub unsafe fn get_kek(
-        vars: &Variable,
-        buffer: &mut [u8],
-    ) -> Result<(u32, usize), Status> {
+    pub unsafe fn get_kek(vars: &Variable, buffer: &mut [u8]) -> Result<(u32, usize), Status> {
         vars.get(
             KEY_EXCHANGE_KEY_VARIABLE.as_ptr(),
             &EFI_IMAGE_SECURITY_DATABASE_GUID,
@@ -506,7 +503,8 @@ pub mod secure_boot {
 
                     for i in 0..sig_count {
                         let sig_offset = sig_data_offset + (i * sig_list.signature_size as usize);
-                        let sig_ptr = (sig_list as *const _ as *const u8).add(sig_offset + core::mem::size_of::<Guid>());
+                        let sig_ptr = (sig_list as *const _ as *const u8)
+                            .add(sig_offset + core::mem::size_of::<Guid>());
                         let sig_hash = core::slice::from_raw_parts(sig_ptr, 32);
 
                         if sig_hash == hash {
@@ -539,9 +537,8 @@ pub mod secure_boot {
                 return None;
             }
 
-            let sig_list = unsafe {
-                &*((self.data.as_ptr() as usize + self.offset) as *const SignatureList)
-            };
+            let sig_list =
+                unsafe { &*((self.data.as_ptr() as usize + self.offset) as *const SignatureList) };
 
             let list_size = sig_list.signature_list_size as usize;
             if self.offset + list_size > self.data.len() || list_size == 0 {
@@ -577,7 +574,8 @@ impl<'a> SafePkcs7Verify<'a> {
         image_hash: &[u8],
     ) -> Result<(), Status> {
         let status = unsafe {
-            self.protocol.verify_buffer(p7_data, trusted_cert, image_hash)
+            self.protocol
+                .verify_buffer(p7_data, trusted_cert, image_hash)
         };
         if status == EFI_SUCCESS {
             Ok(())
@@ -593,9 +591,7 @@ impl<'a> SafePkcs7Verify<'a> {
         trusted_cert: &[u8],
         data: &[u8],
     ) -> Result<(), Status> {
-        let status = unsafe {
-            self.protocol.verify_signature(p7_data, trusted_cert, data)
-        };
+        let status = unsafe { self.protocol.verify_signature(p7_data, trusted_cert, data) };
         if status == EFI_SUCCESS {
             Ok(())
         } else {
@@ -667,11 +663,7 @@ impl<'a> SafeTpm2<'a> {
     }
 
     /// Submit a TPM2 command
-    pub fn submit_command(
-        &mut self,
-        input: &[u8],
-        output: &mut [u8],
-    ) -> Result<usize, Status> {
+    pub fn submit_command(&mut self, input: &[u8], output: &mut [u8]) -> Result<usize, Status> {
         let status = unsafe {
             (self.protocol.submit_command)(
                 self.protocol,
@@ -698,9 +690,7 @@ impl<'a> SafeTpm2<'a> {
     /// Get active PCR banks
     pub fn get_active_pcr_banks(&mut self) -> Result<u32, Status> {
         let mut banks = 0;
-        let status = unsafe {
-            (self.protocol.get_active_pcr_banks)(self.protocol, &mut banks)
-        };
+        let status = unsafe { (self.protocol.get_active_pcr_banks)(self.protocol, &mut banks) };
         if status == EFI_SUCCESS {
             Ok(banks)
         } else {
@@ -721,7 +711,8 @@ impl<'a> SafeTpm2<'a> {
         self.submit_command(&cmd, &mut response)?;
 
         // Check response code
-        let response_code = u32::from_be_bytes([response[6], response[7], response[8], response[9]]);
+        let response_code =
+            u32::from_be_bytes([response[6], response[7], response[8], response[9]]);
         if response_code == 0 {
             Ok(())
         } else {

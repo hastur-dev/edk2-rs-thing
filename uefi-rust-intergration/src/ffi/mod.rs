@@ -3,13 +3,13 @@
 //!
 //! Based on UEFI Specification 2.10
 
-pub mod types;
-pub mod table_header;
 pub mod status;
+pub mod table_header;
+pub mod types;
 
-pub use types::*;
-pub use table_header::*;
 pub use status::*;
+pub use table_header::*;
+pub use types::*;
 
 /// UEFI Handle
 #[repr(C)]
@@ -33,7 +33,12 @@ pub struct Guid {
 
 impl Guid {
     pub const fn new(data1: u32, data2: u16, data3: u16, data4: [u8; 8]) -> Self {
-        Self { data1, data2, data3, data4 }
+        Self {
+            data1,
+            data2,
+            data3,
+            data4,
+        }
     }
 }
 

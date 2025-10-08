@@ -45,12 +45,8 @@ pub struct FileProtocol {
         open_mode: Uint64,
         attributes: Uint64,
     ) -> Status,
-    pub close: unsafe extern "efiapi" fn(
-        this: *mut FileProtocol,
-    ) -> Status,
-    pub delete: unsafe extern "efiapi" fn(
-        this: *mut FileProtocol,
-    ) -> Status,
+    pub close: unsafe extern "efiapi" fn(this: *mut FileProtocol) -> Status,
+    pub delete: unsafe extern "efiapi" fn(this: *mut FileProtocol) -> Status,
     pub read: unsafe extern "efiapi" fn(
         this: *mut FileProtocol,
         buffer_size: *mut Uintn,
@@ -61,14 +57,10 @@ pub struct FileProtocol {
         buffer_size: *mut Uintn,
         buffer: *const core::ffi::c_void,
     ) -> Status,
-    pub get_position: unsafe extern "efiapi" fn(
-        this: *mut FileProtocol,
-        position: *mut Uint64,
-    ) -> Status,
-    pub set_position: unsafe extern "efiapi" fn(
-        this: *mut FileProtocol,
-        position: Uint64,
-    ) -> Status,
+    pub get_position:
+        unsafe extern "efiapi" fn(this: *mut FileProtocol, position: *mut Uint64) -> Status,
+    pub set_position:
+        unsafe extern "efiapi" fn(this: *mut FileProtocol, position: Uint64) -> Status,
     pub get_info: unsafe extern "efiapi" fn(
         this: *mut FileProtocol,
         information_type: *const Guid,
@@ -81,9 +73,7 @@ pub struct FileProtocol {
         buffer_size: Uintn,
         buffer: *const core::ffi::c_void,
     ) -> Status,
-    pub flush: unsafe extern "efiapi" fn(
-        this: *mut FileProtocol,
-    ) -> Status,
+    pub flush: unsafe extern "efiapi" fn(this: *mut FileProtocol) -> Status,
 }
 
 // File open modes

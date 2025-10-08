@@ -398,18 +398,12 @@ pub struct Ip4Protocol {
         subnet_mask: *const Ipv4Address,
         gateway_address: *const Ipv4Address,
     ) -> Status,
-    pub transmit: unsafe extern "efiapi" fn(
-        this: *mut Ip4Protocol,
-        token: *mut Ip4CompletionToken,
-    ) -> Status,
-    pub receive: unsafe extern "efiapi" fn(
-        this: *mut Ip4Protocol,
-        token: *mut Ip4CompletionToken,
-    ) -> Status,
-    pub cancel: unsafe extern "efiapi" fn(
-        this: *mut Ip4Protocol,
-        token: *mut Ip4CompletionToken,
-    ) -> Status,
+    pub transmit:
+        unsafe extern "efiapi" fn(this: *mut Ip4Protocol, token: *mut Ip4CompletionToken) -> Status,
+    pub receive:
+        unsafe extern "efiapi" fn(this: *mut Ip4Protocol, token: *mut Ip4CompletionToken) -> Status,
+    pub cancel:
+        unsafe extern "efiapi" fn(this: *mut Ip4Protocol, token: *mut Ip4CompletionToken) -> Status,
     pub poll: unsafe extern "efiapi" fn(this: *mut Ip4Protocol) -> Status,
 }
 
@@ -446,18 +440,12 @@ pub struct Ip6Protocol {
         timeout: Uint32,
         override_flag: Boolean,
     ) -> Status,
-    pub transmit: unsafe extern "efiapi" fn(
-        this: *mut Ip6Protocol,
-        token: *mut Ip6CompletionToken,
-    ) -> Status,
-    pub receive: unsafe extern "efiapi" fn(
-        this: *mut Ip6Protocol,
-        token: *mut Ip6CompletionToken,
-    ) -> Status,
-    pub cancel: unsafe extern "efiapi" fn(
-        this: *mut Ip6Protocol,
-        token: *mut Ip6CompletionToken,
-    ) -> Status,
+    pub transmit:
+        unsafe extern "efiapi" fn(this: *mut Ip6Protocol, token: *mut Ip6CompletionToken) -> Status,
+    pub receive:
+        unsafe extern "efiapi" fn(this: *mut Ip6Protocol, token: *mut Ip6CompletionToken) -> Status,
+    pub cancel:
+        unsafe extern "efiapi" fn(this: *mut Ip6Protocol, token: *mut Ip6CompletionToken) -> Status,
     pub poll: unsafe extern "efiapi" fn(this: *mut Ip6Protocol) -> Status,
 }
 
@@ -555,10 +543,8 @@ pub struct Dhcp4Protocol {
         this: *mut Dhcp4Protocol,
         config_data: *const Dhcp4ConfigData,
     ) -> Status,
-    pub start: unsafe extern "efiapi" fn(
-        this: *mut Dhcp4Protocol,
-        completion_event: Event,
-    ) -> Status,
+    pub start:
+        unsafe extern "efiapi" fn(this: *mut Dhcp4Protocol, completion_event: Event) -> Status,
     pub renew_rebind: unsafe extern "efiapi" fn(
         this: *mut Dhcp4Protocol,
         rebind_request: Boolean,
@@ -643,10 +629,8 @@ pub struct Dns4Protocol {
         dns_cache_entry: *mut core::ffi::c_void,
     ) -> Status,
     pub poll: unsafe extern "efiapi" fn(this: *mut Dns4Protocol) -> Status,
-    pub cancel: unsafe extern "efiapi" fn(
-        this: *mut Dns4Protocol,
-        token: *mut core::ffi::c_void,
-    ) -> Status,
+    pub cancel:
+        unsafe extern "efiapi" fn(this: *mut Dns4Protocol, token: *mut core::ffi::c_void) -> Status,
 }
 
 impl Ip4Protocol {

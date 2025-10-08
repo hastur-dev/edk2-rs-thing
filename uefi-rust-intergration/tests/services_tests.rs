@@ -3,8 +3,8 @@
 
 #![cfg(test)]
 
-use uefi_rust::ffi::*;
 use uefi_rust::boot_services::*;
+use uefi_rust::ffi::*;
 use uefi_rust::runtime_services::*;
 
 #[test]
@@ -92,7 +92,10 @@ fn test_variable_attributes() {
     assert_eq!(EFI_VARIABLE_RUNTIME_ACCESS, 0x00000004);
     assert_eq!(EFI_VARIABLE_HARDWARE_ERROR_RECORD, 0x00000008);
     assert_eq!(EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, 0x00000010);
-    assert_eq!(EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS, 0x00000020);
+    assert_eq!(
+        EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS,
+        0x00000020
+    );
     assert_eq!(EFI_VARIABLE_APPEND_WRITE, 0x00000040);
 }
 

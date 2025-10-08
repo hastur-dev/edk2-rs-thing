@@ -2,11 +2,11 @@
 //! UEFI Configuration Tables and Firmware Tables
 
 pub mod acpi;
-pub mod smbios;
-pub mod configuration;
 pub mod acpi_advanced;
+pub mod configuration;
+pub mod smbios;
 
 pub use acpi::*;
-pub use smbios::*;
-pub use configuration::*;
 pub use acpi_advanced::*;
+pub use configuration::*;
+pub use smbios::*;

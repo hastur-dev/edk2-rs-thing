@@ -10,7 +10,9 @@ use alloc::vec::Vec;
 macro_rules! guid {
     ($name:ident = $d1:expr, $d2:expr, $d3:expr, [$d4_0:expr, $d4_1:expr, $d4_2:expr, $d4_3:expr, $d4_4:expr, $d4_5:expr, $d4_6:expr, $d4_7:expr]) => {
         pub const $name: $crate::ffi::Guid = $crate::ffi::Guid::new(
-            $d1, $d2, $d3,
+            $d1,
+            $d2,
+            $d3,
             [$d4_0, $d4_1, $d4_2, $d4_3, $d4_4, $d4_5, $d4_6, $d4_7],
         );
     };
@@ -39,7 +41,7 @@ impl core::fmt::Display for Guid {
 impl Guid {
     /// Parse a GUID from a string
     /// Format: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse(s: &str) -> Option<Self> {
         if s.len() != 36 {
             return None;
         }
@@ -106,10 +108,7 @@ mod tests {
         assert_eq!(guid.data1, 0x12345678);
         assert_eq!(guid.data2, 0x1234);
         assert_eq!(guid.data3, 0x5678);
-        assert_eq!(
-            guid.data4,
-            [0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0]
-        );
+        assert_eq!(guid.data4, [0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0]);
     }
 
     #[test]

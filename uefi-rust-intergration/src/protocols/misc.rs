@@ -141,9 +141,12 @@ impl TimestampProtocol {
 
 impl RngProtocol {
     /// Get list of supported RNG algorithms
-    pub unsafe fn get_info(&mut self) -> Result<alloc::vec::Vec<Guid>, Status> {
+    pub unsafe fn get_info(&mut self) -> Result<Vec<Guid>, Status> {
         #[cfg(not(feature = "std"))]
         use alloc::vec::Vec;
+
+        #[cfg(feature = "std")]
+        use std::vec::Vec;
 
         let mut size = 0;
 
@@ -168,11 +171,7 @@ impl RngProtocol {
     }
 
     /// Generate random bytes using specified algorithm
-    pub unsafe fn get_rng(
-        &mut self,
-        algorithm: Option<&Guid>,
-        buffer: &mut [u8],
-    ) -> Status {
+    pub unsafe fn get_rng(&mut self, algorithm: Option<&Guid>, buffer: &mut [u8]) -> Status {
         let algo_ptr = algorithm
             .map(|a| a as *const _)
             .unwrap_or(core::ptr::null());
@@ -254,11 +253,7 @@ pub mod rng_utils {
     use super::*;
 
     /// Generate a random value in range [min, max]
-    pub unsafe fn random_range(
-        rng: &mut RngProtocol,
-        min: u64,
-        max: u64,
-    ) -> Result<u64, Status> {
+    pub unsafe fn random_range(rng: &mut RngProtocol, min: u64, max: u64) -> Result<u64, Status> {
         if min >= max {
             return Err(EFI_INVALID_PARAMETER);
         }

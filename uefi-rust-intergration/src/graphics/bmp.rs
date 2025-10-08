@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! BMP Graphics Library - Convert between BMP and GOP BLT buffer
 
-use crate::ffi::*;
 use crate::protocols::graphics_output::*;
+
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::vec::Vec;
 
 /// BMP File Header
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct BmpFileHeader {
-    pub signature: [u8; 2],      // "BM"
+    pub signature: [u8; 2], // "BM"
     pub file_size: u32,
     pub reserved: u32,
     pub data_offset: u32,
@@ -68,7 +72,9 @@ pub struct BmpImage<'a> {
 impl<'a> BmpImage<'a> {
     /// Parse a BMP file from a buffer
     pub fn from_buffer(buffer: &'a [u8]) -> Result<Self, BmpError> {
-        if buffer.len() < core::mem::size_of::<BmpFileHeader>() + core::mem::size_of::<BmpInfoHeader>() {
+        if buffer.len()
+            < core::mem::size_of::<BmpFileHeader>() + core::mem::size_of::<BmpInfoHeader>()
+        {
             return Err(BmpError::BufferTooSmall);
         }
 
@@ -79,7 +85,8 @@ impl<'a> BmpImage<'a> {
         }
 
         let info_header = unsafe {
-            &*((buffer.as_ptr() as usize + core::mem::size_of::<BmpFileHeader>()) as *const BmpInfoHeader)
+            &*((buffer.as_ptr() as usize + core::mem::size_of::<BmpFileHeader>())
+                as *const BmpInfoHeader)
         };
 
         // Validate dimensions
@@ -96,12 +103,12 @@ impl<'a> BmpImage<'a> {
 
     /// Get image width
     pub fn width(&self) -> u32 {
-        self.info_header.width.abs() as u32
+        self.info_header.width.unsigned_abs()
     }
 
     /// Get image height
     pub fn height(&self) -> u32 {
-        self.info_header.height.abs() as u32
+        self.info_header.height.unsigned_abs()
     }
 
     /// Check if image is bottom-up (height > 0) or top-down (height < 0)
@@ -133,7 +140,7 @@ impl<'a> BmpImage<'a> {
         let mut blt_buffer = Vec::with_capacity((width * height) as usize);
 
         // Calculate row size (must be multiple of 4 bytes)
-        let row_size = ((self.info_header.bits_per_pixel as u32 * width + 31) / 32) * 4;
+        let row_size = (self.info_header.bits_per_pixel as u32 * width).div_ceil(32) * 4;
 
         let pixel_data_start = self.file_header.data_offset as usize;
 
@@ -222,7 +229,7 @@ pub fn blt_to_bmp(
     }
 
     // Calculate row size (must be multiple of 4 bytes)
-    let row_size = ((24 * width + 31) / 32) * 4;
+    let row_size = (24 * width).div_ceil(32) * 4;
     let image_size = row_size * height;
     let file_size = core::mem::size_of::<BmpFileHeader>()
         + core::mem::size_of::<BmpInfoHeader>()
@@ -235,8 +242,8 @@ pub fn blt_to_bmp(
         signature: *b"BM",
         file_size: file_size as u32,
         reserved: 0,
-        data_offset: (core::mem::size_of::<BmpFileHeader>()
-            + core::mem::size_of::<BmpInfoHeader>()) as u32,
+        data_offset: (core::mem::size_of::<BmpFileHeader>() + core::mem::size_of::<BmpInfoHeader>())
+            as u32,
     };
 
     // Info header
@@ -280,9 +287,7 @@ pub fn blt_to_bmp(
 
         // Pad row to multiple of 4 bytes
         let padding = (4 - ((width * 3) % 4)) % 4;
-        for _ in 0..padding {
-            buffer.push(0);
-        }
+        buffer.resize(buffer.len() + padding as usize, 0);
     }
 
     Ok(buffer)
@@ -298,11 +303,32 @@ mod tests {
         use alloc::vec::Vec;
 
         // Create a simple 2x2 image
-        let mut blt_buffer = Vec::new();
-        blt_buffer.push(GraphicsOutputBltPixel { blue: 255, green: 0, red: 0, reserved: 0 });
-        blt_buffer.push(GraphicsOutputBltPixel { blue: 0, green: 255, red: 0, reserved: 0 });
-        blt_buffer.push(GraphicsOutputBltPixel { blue: 0, green: 0, red: 255, reserved: 0 });
-        blt_buffer.push(GraphicsOutputBltPixel { blue: 255, green: 255, red: 255, reserved: 0 });
+        let blt_buffer = vec![
+            GraphicsOutputBltPixel {
+                blue: 255,
+                green: 0,
+                red: 0,
+                reserved: 0,
+            },
+            GraphicsOutputBltPixel {
+                blue: 0,
+                green: 255,
+                red: 0,
+                reserved: 0,
+            },
+            GraphicsOutputBltPixel {
+                blue: 0,
+                green: 0,
+                red: 255,
+                reserved: 0,
+            },
+            GraphicsOutputBltPixel {
+                blue: 255,
+                green: 255,
+                red: 255,
+                reserved: 0,
+            },
+        ];
 
         let bmp_data = blt_to_bmp(&blt_buffer, 2, 2).unwrap();
         let bmp = BmpImage::from_buffer(&bmp_data).unwrap();

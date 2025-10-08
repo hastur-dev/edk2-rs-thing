@@ -100,10 +100,8 @@ pub struct HiiDatabaseProtocol {
         driver_handle: Handle,
         handle: *mut HiiHandle,
     ) -> Status,
-    pub remove_package_list: unsafe extern "efiapi" fn(
-        this: *mut HiiDatabaseProtocol,
-        handle: HiiHandle,
-    ) -> Status,
+    pub remove_package_list:
+        unsafe extern "efiapi" fn(this: *mut HiiDatabaseProtocol, handle: HiiHandle) -> Status,
     pub update_package_list: unsafe extern "efiapi" fn(
         this: *mut HiiDatabaseProtocol,
         handle: HiiHandle,
@@ -145,10 +143,8 @@ pub struct HiiDatabaseProtocol {
         keyboard_layout_length: *mut Uint16,
         keyboard_layout: *mut core::ffi::c_void,
     ) -> Status,
-    pub set_keyboard_layout: unsafe extern "efiapi" fn(
-        this: *mut HiiDatabaseProtocol,
-        key_guid: *const Guid,
-    ) -> Status,
+    pub set_keyboard_layout:
+        unsafe extern "efiapi" fn(this: *mut HiiDatabaseProtocol, key_guid: *const Guid) -> Status,
     pub get_package_list_handle: unsafe extern "efiapi" fn(
         this: *mut HiiDatabaseProtocol,
         package_list_handle: HiiHandle,
@@ -493,7 +489,8 @@ impl HiiDatabaseProtocol {
         driver_handle: Handle,
     ) -> Result<HiiHandle, Status> {
         let mut handle: HiiHandle = core::ptr::null_mut();
-        let status = (self.new_package_list)(self, package_list as *const _, driver_handle, &mut handle);
+        let status =
+            (self.new_package_list)(self, package_list as *const _, driver_handle, &mut handle);
 
         if status == EFI_SUCCESS {
             Ok(handle)

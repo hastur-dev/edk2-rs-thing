@@ -7,10 +7,10 @@
 extern crate alloc;
 extern crate uefi_rust_intergration;
 
-use uefi_rust_intergration::*;
-use uefi_rust_intergration::protocols::*;
 use alloc::vec::Vec;
 use core::fmt::Write;
+use uefi_rust_intergration::protocols::*;
+use uefi_rust_intergration::*;
 
 struct ConsoleWriter {
     console: *mut SimpleTextOutputProtocol,
@@ -61,7 +61,10 @@ pub extern "efiapi" fn efi_main(
         // Print banner
         let _ = writeln!(writer, "=================================================");
         let _ = writeln!(writer, "  UEFI Rust Integration - Protocol Demo");
-        let _ = writeln!(writer, "=================================================\r\n");
+        let _ = writeln!(
+            writer,
+            "=================================================\r\n"
+        );
 
         log_info!("Application started");
 
@@ -82,8 +85,7 @@ pub extern "efiapi" fn efi_main(
                 let _ = writeln!(
                     writer,
                     "    Resolution: {}x{}",
-                    info.horizontal_resolution,
-                    info.vertical_resolution
+                    info.horizontal_resolution, info.vertical_resolution
                 );
                 let _ = writeln!(writer, "    Pixel Format: {:?}", info.pixel_format);
             }
@@ -108,7 +110,11 @@ pub extern "efiapi" fn efi_main(
         );
 
         if status == EFI_SUCCESS && !handles.is_null() {
-            let _ = writeln!(writer, "    [OK] Found {} Block I/O device(s)", handle_count);
+            let _ = writeln!(
+                writer,
+                "    [OK] Found {} Block I/O device(s)",
+                handle_count
+            );
 
             for i in 0..handle_count.min(3) {
                 let handle = *handles.add(i);
@@ -122,8 +128,11 @@ pub extern "efiapi" fn efi_main(
                 if status == EFI_SUCCESS && !bio.is_null() {
                     let bio = &*bio;
                     if let Some(media) = bio.media_info() {
-                        let _ = writeln!(writer, "    Device {}: Block Size = {} bytes, Last Block = {}",
-                            i, media.block_size, media.last_block);
+                        let _ = writeln!(
+                            writer,
+                            "    Device {}: Block Size = {} bytes, Last Block = {}",
+                            i, media.block_size, media.last_block
+                        );
                     }
                 }
             }
@@ -135,7 +144,10 @@ pub extern "efiapi" fn efi_main(
         }
 
         // Demonstrate Simple File System Protocol
-        let _ = writeln!(writer, "\r\n[3] Searching for Simple File System Protocol...");
+        let _ = writeln!(
+            writer,
+            "\r\n[3] Searching for Simple File System Protocol..."
+        );
         let mut fs_handles: *mut *mut Handle = core::ptr::null_mut();
         let mut fs_count: Uintn = 0;
         let status = (*bs).locate_handle_buffer(
@@ -201,8 +213,11 @@ pub extern "efiapi" fn efi_main(
                 if status == EFI_SUCCESS && !pci.is_null() {
                     let pci = &mut *pci;
                     if let Ok((seg, bus, dev, func)) = pci.get_location() {
-                        let _ = writeln!(writer, "    Device {}: {:02X}:{:02X}.{:X}",
-                            i, bus, dev, func);
+                        let _ = writeln!(
+                            writer,
+                            "    Device {}: {:02X}:{:02X}.{:X}",
+                            i, bus, dev, func
+                        );
                     }
                 }
             }
@@ -225,7 +240,10 @@ pub extern "efiapi" fn efi_main(
         log_info!("All protocol demonstrations completed");
 
         // Wait for key
-        let _ = writeln!(writer, "\r\n=================================================");
+        let _ = writeln!(
+            writer,
+            "\r\n================================================="
+        );
         let _ = writeln!(writer, "Press any key to exit...");
         let _ = writeln!(writer, "=================================================");
 

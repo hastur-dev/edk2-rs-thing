@@ -172,9 +172,7 @@ pub struct UsbIoProtocol {
         lang_id_table: *mut *mut Uint16,
         table_size: *mut Uint16,
     ) -> Status,
-    pub usb_port_reset: unsafe extern "efiapi" fn(
-        this: *mut UsbIoProtocol,
-    ) -> Status,
+    pub usb_port_reset: unsafe extern "efiapi" fn(this: *mut UsbIoProtocol) -> Status,
 }
 
 impl UsbIoProtocol {

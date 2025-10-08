@@ -3,8 +3,8 @@
 
 #![cfg(test)]
 
-use uefi_rust::protocols::storage::*;
 use uefi_rust::ffi::*;
+use uefi_rust::protocols::storage::*;
 
 #[test]
 fn test_scsi_commands() {
@@ -154,8 +154,14 @@ fn test_nvme_io_commands() {
 
 #[test]
 fn test_storage_protocol_guids_unique() {
-    assert_ne!(SCSI_PASS_THRU_PROTOCOL_GUID, EXT_SCSI_PASS_THRU_PROTOCOL_GUID);
-    assert_ne!(SCSI_PASS_THRU_PROTOCOL_GUID, NVM_EXPRESS_PASS_THRU_PROTOCOL_GUID);
+    assert_ne!(
+        SCSI_PASS_THRU_PROTOCOL_GUID,
+        EXT_SCSI_PASS_THRU_PROTOCOL_GUID
+    );
+    assert_ne!(
+        SCSI_PASS_THRU_PROTOCOL_GUID,
+        NVM_EXPRESS_PASS_THRU_PROTOCOL_GUID
+    );
     assert_ne!(DISK_IO_PROTOCOL_GUID, DISK_IO2_PROTOCOL_GUID);
     assert_ne!(DISK_IO_PROTOCOL_GUID, PARTITION_INFO_PROTOCOL_GUID);
 }
@@ -225,7 +231,7 @@ fn test_scsi_builder_inquiry() {
     assert_eq!(cdb[0], scsi_commands::SCSI_INQUIRY);
     assert_eq!(cdb[1], 0x00); // EVPD=0
     assert_eq!(cdb[2], 0x00); // Page code
-    assert_eq!(cdb[4], 36);   // Allocation length
+    assert_eq!(cdb[4], 36); // Allocation length
 
     // Verify packet
     assert_eq!(packet.cdb_length, 6);
@@ -247,9 +253,9 @@ fn test_scsi_builder_read10() {
 
     // Verify LBA encoding (big-endian)
     let decoded_lba = ((cdb[2] as u32) << 24)
-                    | ((cdb[3] as u32) << 16)
-                    | ((cdb[4] as u32) << 8)
-                    | (cdb[5] as u32);
+        | ((cdb[3] as u32) << 16)
+        | ((cdb[4] as u32) << 8)
+        | (cdb[5] as u32);
     assert_eq!(decoded_lba, lba);
 
     // Verify transfer length (1 block)
@@ -273,9 +279,9 @@ fn test_scsi_builder_write10() {
 
     // Verify LBA encoding
     let decoded_lba = ((cdb[2] as u32) << 24)
-                    | ((cdb[3] as u32) << 16)
-                    | ((cdb[4] as u32) << 8)
-                    | (cdb[5] as u32);
+        | ((cdb[3] as u32) << 16)
+        | ((cdb[4] as u32) << 8)
+        | (cdb[5] as u32);
     assert_eq!(decoded_lba, lba);
 
     // Verify packet
@@ -413,9 +419,9 @@ fn test_zero_lba() {
 
     // Verify LBA 0
     let decoded_lba = ((cdb[2] as u32) << 24)
-                    | ((cdb[3] as u32) << 16)
-                    | ((cdb[4] as u32) << 8)
-                    | (cdb[5] as u32);
+        | ((cdb[3] as u32) << 16)
+        | ((cdb[4] as u32) << 8)
+        | (cdb[5] as u32);
     assert_eq!(decoded_lba, 0);
 }
 
@@ -427,9 +433,9 @@ fn test_max_lba_32bit() {
 
     // Verify max LBA encoding
     let decoded_lba = ((cdb[2] as u32) << 24)
-                    | ((cdb[3] as u32) << 16)
-                    | ((cdb[4] as u32) << 8)
-                    | (cdb[5] as u32);
+        | ((cdb[3] as u32) << 16)
+        | ((cdb[4] as u32) << 8)
+        | (cdb[5] as u32);
     assert_eq!(decoded_lba, max_lba);
     assert_eq!(cdb[2], 0xFF);
     assert_eq!(cdb[3], 0xFF);
@@ -527,10 +533,19 @@ fn test_data_direction_values() {
 #[test]
 fn test_structure_alignments() {
     // Verify structures have reasonable alignment
-    assert_eq!(core::mem::align_of::<ScsiPassThruRequestPacket>(), core::mem::align_of::<u64>());
-    assert_eq!(core::mem::align_of::<NvmeCommand>(), core::mem::align_of::<u32>());
+    assert_eq!(
+        core::mem::align_of::<ScsiPassThruRequestPacket>(),
+        core::mem::align_of::<u64>()
+    );
+    assert_eq!(
+        core::mem::align_of::<NvmeCommand>(),
+        core::mem::align_of::<u32>()
+    );
     assert_eq!(core::mem::align_of::<MbrPartitionRecord>(), 1); // Packed
-    assert_eq!(core::mem::align_of::<GptPartitionEntry>(), core::mem::align_of::<u64>());
+    assert_eq!(
+        core::mem::align_of::<GptPartitionEntry>(),
+        core::mem::align_of::<u64>()
+    );
 }
 
 #[test]
@@ -566,9 +581,9 @@ fn test_realistic_read_sector() {
 
     // Verify LBA
     let decoded_lba = ((cdb[2] as u32) << 24)
-                    | ((cdb[3] as u32) << 16)
-                    | ((cdb[4] as u32) << 8)
-                    | (cdb[5] as u32);
+        | ((cdb[3] as u32) << 16)
+        | ((cdb[4] as u32) << 8)
+        | (cdb[5] as u32);
     assert_eq!(decoded_lba, 100);
 }
 

@@ -6,11 +6,11 @@
 
 #![cfg(test)]
 
-use std::process::{Command, Stdio};
-use std::path::{Path, PathBuf};
 use std::fs;
-use std::time::Duration;
 use std::io::{BufRead, BufReader};
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::time::Duration;
 
 /// QEMU test configuration
 pub struct QemuConfig {
@@ -75,19 +75,31 @@ pub fn run_in_qemu(efi_path: &Path, config: &QemuConfig) -> Result<QemuTestResul
 
     // Copy OVMF vars to temp location for this run
     let temp_vars = temp_dir.join("OVMF_VARS.fd");
-    fs::copy(&config.ovmf_vars, &temp_vars).map_err(|e| format!("Failed to copy OVMF vars: {}", e))?;
+    fs::copy(&config.ovmf_vars, &temp_vars)
+        .map_err(|e| format!("Failed to copy OVMF vars: {}", e))?;
 
     // Build QEMU command
     let mut cmd = Command::new(&config.qemu_path);
     cmd.arg("-enable-kvm")
-        .arg("-machine").arg("q35")
-        .arg("-cpu").arg("host")
-        .arg("-m").arg(format!("{}M", config.memory_mb))
-        .arg("-drive").arg(format!("if=pflash,format=raw,readonly=on,file={}", config.ovmf_code.display()))
-        .arg("-drive").arg(format!("if=pflash,format=raw,file={}", temp_vars.display()))
-        .arg("-drive").arg(format!("format=raw,file=fat:rw:{}", esp_dir.display()))
-        .arg("-serial").arg("stdio")
-        .arg("-display").arg("none")
+        .arg("-machine")
+        .arg("q35")
+        .arg("-cpu")
+        .arg("host")
+        .arg("-m")
+        .arg(format!("{}M", config.memory_mb))
+        .arg("-drive")
+        .arg(format!(
+            "if=pflash,format=raw,readonly=on,file={}",
+            config.ovmf_code.display()
+        ))
+        .arg("-drive")
+        .arg(format!("if=pflash,format=raw,file={}", temp_vars.display()))
+        .arg("-drive")
+        .arg(format!("format=raw,file=fat:rw:{}", esp_dir.display()))
+        .arg("-serial")
+        .arg("stdio")
+        .arg("-display")
+        .arg("none")
         .arg("-no-reboot")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
@@ -98,7 +110,9 @@ pub fn run_in_qemu(efi_path: &Path, config: &QemuConfig) -> Result<QemuTestResul
     }
 
     // Spawn the process
-    let mut child = cmd.spawn().map_err(|e| format!("Failed to spawn QEMU: {}", e))?;
+    let mut child = cmd
+        .spawn()
+        .map_err(|e| format!("Failed to spawn QEMU: {}", e))?;
 
     // Capture output with timeout
     let stdout_handle = child.stdout.take().ok_or("Failed to capture stdout")?;

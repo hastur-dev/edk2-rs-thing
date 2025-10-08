@@ -3,9 +3,9 @@
 
 use crate::ffi::*;
 #[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
-#[cfg(not(feature = "std"))]
 use alloc::string::String;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 
 /// Convert a Rust string slice to a null-terminated UCS-2 (Char16) vector
 pub fn str_to_ucs2(s: &str) -> Vec<Char16> {
@@ -34,8 +34,7 @@ pub unsafe fn ucs2_to_string(ptr: *const Char16) -> Result<String, core::char::D
     }
 
     let slice = core::slice::from_raw_parts(ptr, len);
-    char::decode_utf16(slice.iter().copied())
-        .collect::<Result<String, _>>()
+    char::decode_utf16(slice.iter().copied()).collect::<Result<String, _>>()
 }
 
 /// Get the length of a null-terminated UCS-2 string
@@ -186,23 +185,33 @@ mod tests {
 
     #[test]
     fn test_ucs2_to_string() {
-        let ucs2: Vec<Char16> = vec!['H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0];
+        let ucs2: Vec<Char16> = vec![
+            'H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0,
+        ];
         let s = unsafe { ucs2_to_string(ucs2.as_ptr()).unwrap() };
         assert_eq!(s, "Hello");
     }
 
     #[test]
     fn test_ucs2_strlen() {
-        let ucs2: Vec<Char16> = vec!['H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0];
+        let ucs2: Vec<Char16> = vec![
+            'H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0,
+        ];
         let len = unsafe { ucs2_strlen(ucs2.as_ptr()) };
         assert_eq!(len, 5);
     }
 
     #[test]
     fn test_ucs2_strcmp() {
-        let s1: Vec<Char16> = vec!['H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0];
-        let s2: Vec<Char16> = vec!['H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0];
-        let s3: Vec<Char16> = vec!['W' as u16, 'o' as u16, 'r' as u16, 'l' as u16, 'd' as u16, 0];
+        let s1: Vec<Char16> = vec![
+            'H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0,
+        ];
+        let s2: Vec<Char16> = vec![
+            'H' as u16, 'e' as u16, 'l' as u16, 'l' as u16, 'o' as u16, 0,
+        ];
+        let s3: Vec<Char16> = vec![
+            'W' as u16, 'o' as u16, 'r' as u16, 'l' as u16, 'd' as u16, 0,
+        ];
 
         let cmp1 = unsafe { ucs2_strcmp(s1.as_ptr(), s2.as_ptr()) };
         let cmp2 = unsafe { ucs2_strcmp(s1.as_ptr(), s3.as_ptr()) };

@@ -8,15 +8,15 @@ use crate::runtime_services::RuntimeServices;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Time {
-    pub year: Uint16,        // 1900 - 9999
-    pub month: Uint8,        // 1 - 12
-    pub day: Uint8,          // 1 - 31
-    pub hour: Uint8,         // 0 - 23
-    pub minute: Uint8,       // 0 - 59
-    pub second: Uint8,       // 0 - 59
+    pub year: Uint16,  // 1900 - 9999
+    pub month: Uint8,  // 1 - 12
+    pub day: Uint8,    // 1 - 31
+    pub hour: Uint8,   // 0 - 23
+    pub minute: Uint8, // 0 - 59
+    pub second: Uint8, // 0 - 59
     pub pad1: Uint8,
-    pub nanosecond: Uint32,  // 0 - 999,999,999
-    pub time_zone: Int16,    // -1440 to 1440 or 2047
+    pub nanosecond: Uint32, // 0 - 999,999,999
+    pub time_zone: Int16,   // -1440 to 1440 or 2047
     pub daylight: Uint8,
     pub pad2: Uint8,
 }
@@ -37,14 +37,7 @@ pub const EFI_UNSPECIFIED_TIMEZONE: i16 = 0x07FF;
 
 impl Time {
     /// Create a new time
-    pub fn new(
-        year: u16,
-        month: u8,
-        day: u8,
-        hour: u8,
-        minute: u8,
-        second: u8,
-    ) -> Self {
+    pub fn new(year: u16, month: u8, day: u8, hour: u8, minute: u8, second: u8) -> Self {
         Time {
             year,
             month,

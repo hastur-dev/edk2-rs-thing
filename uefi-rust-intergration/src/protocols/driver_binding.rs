@@ -2,7 +2,12 @@
 //! UEFI Driver Binding Protocol - Driver Model Support
 
 use crate::ffi::*;
+
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::vec::Vec;
 
 /// EFI_DRIVER_BINDING_PROTOCOL_GUID
 pub const DRIVER_BINDING_PROTOCOL_GUID: Guid = Guid::new(
@@ -211,8 +216,7 @@ impl DriverDiagnostics2Protocol {
 
         if status == EFI_SUCCESS && !error_type.is_null() && !buffer.is_null() {
             let guid = *error_type;
-            let result_buffer = core::slice::from_raw_parts(buffer, buffer_size)
-                .to_vec();
+            let result_buffer = core::slice::from_raw_parts(buffer, buffer_size).to_vec();
             Ok((guid, result_buffer))
         } else {
             Err(status)

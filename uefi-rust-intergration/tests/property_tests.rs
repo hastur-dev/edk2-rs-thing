@@ -37,8 +37,16 @@ fn property_status_classification() {
     }
 
     for &code in &warning_codes {
-        assert!(!is_error(code), "Warning code {:x} should not be error", code);
-        assert!(!is_success(code), "Warning code {:x} should not be success", code);
+        assert!(
+            !is_error(code),
+            "Warning code {:x} should not be error",
+            code
+        );
+        assert!(
+            !is_success(code),
+            "Warning code {:x} should not be success",
+            code
+        );
     }
 }
 
@@ -101,12 +109,7 @@ fn property_memory_type_contiguous() {
 /// Test property: TPL levels should be strictly ordered
 #[test]
 fn property_tpl_ordering() {
-    let tpl_levels = [
-        TPL_APPLICATION,
-        TPL_CALLBACK,
-        TPL_NOTIFY,
-        TPL_HIGH_LEVEL,
-    ];
+    let tpl_levels = [TPL_APPLICATION, TPL_CALLBACK, TPL_NOTIFY, TPL_HIGH_LEVEL];
 
     for i in 0..tpl_levels.len() - 1 {
         assert!(
@@ -343,9 +346,9 @@ fn property_scsi_builder_produces_valid_packets() {
 
         // LBA should be correctly encoded
         let decoded_lba = ((cdb[2] as u32) << 24)
-                        | ((cdb[3] as u32) << 16)
-                        | ((cdb[4] as u32) << 8)
-                        | (cdb[5] as u32);
+            | ((cdb[3] as u32) << 16)
+            | ((cdb[4] as u32) << 8)
+            | (cdb[5] as u32);
         assert_eq!(decoded_lba, lba);
     }
 }
@@ -354,10 +357,10 @@ fn property_scsi_builder_produces_valid_packets() {
 #[test]
 fn property_block_count_calculation() {
     let test_cases = [
-        (512, 1),    // 1 block
-        (1024, 2),   // 2 blocks
-        (4096, 8),   // 8 blocks
-        (8192, 16),  // 16 blocks
+        (512, 1),   // 1 block
+        (1024, 2),  // 2 blocks
+        (4096, 8),  // 8 blocks
+        (8192, 16), // 16 blocks
     ];
 
     for &(buffer_size, expected_blocks) in &test_cases {
@@ -365,7 +368,11 @@ fn property_block_count_calculation() {
         let (_packet, cdb) = scsi_builder::build_read10(0, &mut buffer, 1_000_000);
 
         let blocks = ((cdb[7] as u16) << 8) | (cdb[8] as u16);
-        assert_eq!(blocks, expected_blocks, "Buffer size {} should give {} blocks", buffer_size, expected_blocks);
+        assert_eq!(
+            blocks, expected_blocks,
+            "Buffer size {} should give {} blocks",
+            buffer_size, expected_blocks
+        );
     }
 }
 
@@ -418,11 +425,7 @@ fn property_hash_algorithm_guids_unique() {
 /// Property: Certificate type GUIDs should be unique
 #[test]
 fn property_cert_type_guids_unique() {
-    let guids = [
-        CERT_SHA256_GUID,
-        CERT_RSA2048_GUID,
-        CERT_X509_GUID,
-    ];
+    let guids = [CERT_SHA256_GUID, CERT_RSA2048_GUID, CERT_X509_GUID];
 
     for i in 0..guids.len() {
         for j in i + 1..guids.len() {
@@ -548,7 +551,11 @@ fn property_secure_boot_variable_names_null_terminated() {
     ];
 
     for name in &variable_names {
-        assert_eq!(name.last(), Some(&0x0000), "Variable name should be null-terminated");
+        assert_eq!(
+            name.last(),
+            Some(&0x0000),
+            "Variable name should be null-terminated"
+        );
     }
 }
 
@@ -627,11 +634,14 @@ fn property_lba_encoding_reversible() {
 
         // Decode back
         let decoded_lba = ((bytes[0] as u32) << 24)
-                        | ((bytes[1] as u32) << 16)
-                        | ((bytes[2] as u32) << 8)
-                        | (bytes[3] as u32);
+            | ((bytes[1] as u32) << 16)
+            | ((bytes[2] as u32) << 8)
+            | (bytes[3] as u32);
 
-        assert_eq!(original_lba, decoded_lba, "LBA encoding should be reversible");
+        assert_eq!(
+            original_lba, decoded_lba,
+            "LBA encoding should be reversible"
+        );
     }
 }
 
@@ -675,6 +685,11 @@ fn property_all_errors_have_error_bit() {
     ];
 
     for &error in &all_errors {
-        assert_ne!(error & ERROR_BIT, 0, "Error code {:x} should have error bit set", error);
+        assert_ne!(
+            error & ERROR_BIT,
+            0,
+            "Error code {:x} should have error bit set",
+            error
+        );
     }
 }

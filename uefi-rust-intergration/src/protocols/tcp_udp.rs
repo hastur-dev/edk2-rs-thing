@@ -303,14 +303,10 @@ pub struct Tcp4Protocol {
         this: *mut Tcp4Protocol,
         listen_token: *mut Tcp4CompletionToken,
     ) -> Status,
-    pub transmit: unsafe extern "efiapi" fn(
-        this: *mut Tcp4Protocol,
-        token: *mut Tcp4IoToken,
-    ) -> Status,
-    pub receive: unsafe extern "efiapi" fn(
-        this: *mut Tcp4Protocol,
-        token: *mut Tcp4IoToken,
-    ) -> Status,
+    pub transmit:
+        unsafe extern "efiapi" fn(this: *mut Tcp4Protocol, token: *mut Tcp4IoToken) -> Status,
+    pub receive:
+        unsafe extern "efiapi" fn(this: *mut Tcp4Protocol, token: *mut Tcp4IoToken) -> Status,
     pub close: unsafe extern "efiapi" fn(
         this: *mut Tcp4Protocol,
         close_token: *mut Tcp4CompletionToken,
@@ -345,14 +341,10 @@ pub struct Tcp6Protocol {
         this: *mut Tcp6Protocol,
         listen_token: *mut Tcp6CompletionToken,
     ) -> Status,
-    pub transmit: unsafe extern "efiapi" fn(
-        this: *mut Tcp6Protocol,
-        token: *mut Tcp6IoToken,
-    ) -> Status,
-    pub receive: unsafe extern "efiapi" fn(
-        this: *mut Tcp6Protocol,
-        token: *mut Tcp6IoToken,
-    ) -> Status,
+    pub transmit:
+        unsafe extern "efiapi" fn(this: *mut Tcp6Protocol, token: *mut Tcp6IoToken) -> Status,
+    pub receive:
+        unsafe extern "efiapi" fn(this: *mut Tcp6Protocol, token: *mut Tcp6IoToken) -> Status,
     pub close: unsafe extern "efiapi" fn(
         this: *mut Tcp6Protocol,
         close_token: *mut Tcp6CompletionToken,

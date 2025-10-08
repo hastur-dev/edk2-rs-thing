@@ -3,12 +3,12 @@
 
 use crate::ffi::*;
 
-pub mod safe_wrappers;
 pub mod events;
+pub mod safe_wrappers;
 pub mod tpl;
 
-pub use safe_wrappers::BootServicesWrapper;
 pub use events::*;
+pub use safe_wrappers::BootServicesWrapper;
 pub use tpl::*;
 
 /// EFI_BOOT_SERVICES Table
@@ -50,8 +50,13 @@ pub struct BootServices {
         notify_context: *mut core::ffi::c_void,
         event: *mut Event,
     ) -> Status,
-    pub set_timer: unsafe extern "efiapi" fn(event: Event, timer_type: Uint32, trigger_time: Uint64) -> Status,
-    pub wait_for_event: unsafe extern "efiapi" fn(number_of_events: Uintn, event: *mut Event, index: *mut Uintn) -> Status,
+    pub set_timer:
+        unsafe extern "efiapi" fn(event: Event, timer_type: Uint32, trigger_time: Uint64) -> Status,
+    pub wait_for_event: unsafe extern "efiapi" fn(
+        number_of_events: Uintn,
+        event: *mut Event,
+        index: *mut Uintn,
+    ) -> Status,
     pub signal_event: unsafe extern "efiapi" fn(event: Event) -> Status,
     pub close_event: unsafe extern "efiapi" fn(event: Event) -> Status,
     pub check_event: unsafe extern "efiapi" fn(event: Event) -> Status,
@@ -97,7 +102,8 @@ pub struct BootServices {
         device_path: *mut *mut core::ffi::c_void,
         device: *mut *mut Handle,
     ) -> Status,
-    pub install_configuration_table: unsafe extern "efiapi" fn(guid: *const Guid, table: *mut core::ffi::c_void) -> Status,
+    pub install_configuration_table:
+        unsafe extern "efiapi" fn(guid: *const Guid, table: *mut core::ffi::c_void) -> Status,
 
     // Image Services
     pub load_image: unsafe extern "efiapi" fn(
@@ -120,7 +126,8 @@ pub struct BootServices {
         exit_data: *mut Char16,
     ) -> Status,
     pub unload_image: unsafe extern "efiapi" fn(image_handle: *mut Handle) -> Status,
-    pub exit_boot_services: unsafe extern "efiapi" fn(image_handle: *mut Handle, map_key: Uintn) -> Status,
+    pub exit_boot_services:
+        unsafe extern "efiapi" fn(image_handle: *mut Handle, map_key: Uintn) -> Status,
 
     // Miscellaneous Services
     pub get_next_monotonic_count: unsafe extern "efiapi" fn(count: *mut Uint64) -> Status,
@@ -196,8 +203,13 @@ pub struct BootServices {
     ) -> Status,
 
     // Miscellaneous Services
-    pub copy_mem: unsafe extern "efiapi" fn(destination: *mut core::ffi::c_void, source: *mut core::ffi::c_void, length: Uintn),
-    pub set_mem: unsafe extern "efiapi" fn(buffer: *mut core::ffi::c_void, size: Uintn, value: Uint8),
+    pub copy_mem: unsafe extern "efiapi" fn(
+        destination: *mut core::ffi::c_void,
+        source: *mut core::ffi::c_void,
+        length: Uintn,
+    ),
+    pub set_mem:
+        unsafe extern "efiapi" fn(buffer: *mut core::ffi::c_void, size: Uintn, value: Uint8),
     pub create_event_ex: unsafe extern "efiapi" fn(
         event_type: Uint32,
         notify_tpl: Tpl,

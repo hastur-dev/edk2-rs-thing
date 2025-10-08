@@ -111,14 +111,23 @@ fn test_multiple_pool_allocations() {
 
     let (count, total) = get_pool_stats();
     assert_eq!(count, 5, "Expected 5 allocations, got {}", count);
-    assert_eq!(total, 64 + 128 + 256 + 512 + 1024, "Expected total of 1984 bytes, got {}", total);
+    assert_eq!(
+        total,
+        64 + 128 + 256 + 512 + 1024,
+        "Expected total of 1984 bytes, got {}",
+        total
+    );
 
     for ptr in ptrs {
         let _ = unsafe { (bs.free_pool)(ptr) };
     }
 
     let (count_final, _) = get_pool_stats();
-    assert_eq!(count_final, 0, "Expected 0 allocations after free, got {}", count_final);
+    assert_eq!(
+        count_final, 0,
+        "Expected 0 allocations after free, got {}",
+        count_final
+    );
 
     clear_mock_pool();
 }
@@ -244,22 +253,44 @@ fn test_pool_stress_test() {
                 &mut ptr,
             )
         };
-        assert_eq!(status, uefi_rust_intergration::EFI_SUCCESS, "Failed to allocate block {}", i);
+        assert_eq!(
+            status,
+            uefi_rust_intergration::EFI_SUCCESS,
+            "Failed to allocate block {}",
+            i
+        );
         ptrs.push(ptr);
     }
 
     let (count, _) = get_pool_stats();
-    assert_eq!(count, iterations, "Expected {} allocations, got {}", iterations, count);
+    assert_eq!(
+        count, iterations,
+        "Expected {} allocations, got {}",
+        iterations, count
+    );
 
     // Free all blocks
     for (i, ptr) in ptrs.into_iter().enumerate() {
         let status = unsafe { (bs.free_pool)(ptr) };
-        assert_eq!(status, uefi_rust_intergration::EFI_SUCCESS, "Failed to free block {}", i);
+        assert_eq!(
+            status,
+            uefi_rust_intergration::EFI_SUCCESS,
+            "Failed to free block {}",
+            i
+        );
     }
 
     let (count_final, total_final) = get_pool_stats();
-    assert_eq!(count_final, 0, "Expected 0 allocations after free, got {}", count_final);
-    assert_eq!(total_final, 0, "Expected 0 bytes after free, got {}", total_final);
+    assert_eq!(
+        count_final, 0,
+        "Expected 0 allocations after free, got {}",
+        count_final
+    );
+    assert_eq!(
+        total_final, 0,
+        "Expected 0 bytes after free, got {}",
+        total_final
+    );
 
     clear_mock_pool();
 }

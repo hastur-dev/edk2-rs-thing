@@ -48,22 +48,16 @@ pub struct SimpleTextOutputProtocol {
         this: *mut SimpleTextOutputProtocol,
         mode_number: Uintn,
     ) -> Status,
-    pub set_attribute: unsafe extern "efiapi" fn(
-        this: *mut SimpleTextOutputProtocol,
-        attribute: Uintn,
-    ) -> Status,
-    pub clear_screen: unsafe extern "efiapi" fn(
-        this: *mut SimpleTextOutputProtocol,
-    ) -> Status,
+    pub set_attribute:
+        unsafe extern "efiapi" fn(this: *mut SimpleTextOutputProtocol, attribute: Uintn) -> Status,
+    pub clear_screen: unsafe extern "efiapi" fn(this: *mut SimpleTextOutputProtocol) -> Status,
     pub set_cursor_position: unsafe extern "efiapi" fn(
         this: *mut SimpleTextOutputProtocol,
         column: Uintn,
         row: Uintn,
     ) -> Status,
-    pub enable_cursor: unsafe extern "efiapi" fn(
-        this: *mut SimpleTextOutputProtocol,
-        visible: Boolean,
-    ) -> Status,
+    pub enable_cursor:
+        unsafe extern "efiapi" fn(this: *mut SimpleTextOutputProtocol, visible: Boolean) -> Status,
     pub mode: *mut SimpleTextOutputMode,
 }
 

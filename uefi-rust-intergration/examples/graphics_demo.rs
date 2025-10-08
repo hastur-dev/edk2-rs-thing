@@ -10,10 +10,10 @@
 
 extern crate alloc;
 
-use uefi_rust::*;
-use uefi_rust::protocols::*;
-use uefi_rust::boot_services::*;
 use alloc::vec::Vec;
+use uefi_rust::boot_services::*;
+use uefi_rust::protocols::*;
+use uefi_rust::*;
 
 #[no_mangle]
 pub extern "C" fn efi_main(image_handle: Handle, system_table: *mut SystemTable) -> Status {

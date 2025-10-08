@@ -182,11 +182,7 @@ impl MpServicesProtocol {
     }
 
     /// Switch the Bootstrap Processor
-    pub unsafe fn switch_bsp(
-        &mut self,
-        new_bsp: usize,
-        enable_old_bsp: bool,
-    ) -> Status {
+    pub unsafe fn switch_bsp(&mut self, new_bsp: usize, enable_old_bsp: bool) -> Status {
         (self.switch_bsp)(self, new_bsp, enable_old_bsp as Boolean)
     }
 
@@ -197,12 +193,8 @@ impl MpServicesProtocol {
         enable: bool,
     ) -> Result<u32, Status> {
         let mut health_flag = 0;
-        let status = (self.enable_disable_ap)(
-            self,
-            processor_number,
-            enable as Boolean,
-            &mut health_flag,
-        );
+        let status =
+            (self.enable_disable_ap)(self, processor_number, enable as Boolean, &mut health_flag);
 
         if status == EFI_SUCCESS {
             Ok(health_flag)
@@ -246,9 +238,12 @@ pub mod mp_utils {
     /// Get all processor information
     pub unsafe fn get_all_processors(
         mp: &mut MpServicesProtocol,
-    ) -> Result<alloc::vec::Vec<ProcessorInformation>, Status> {
+    ) -> Result<Vec<ProcessorInformation>, Status> {
         #[cfg(not(feature = "std"))]
         use alloc::vec::Vec;
+
+        #[cfg(feature = "std")]
+        use std::vec::Vec;
 
         let (total, _) = mp.get_number_of_processors()?;
         let mut processors = Vec::with_capacity(total);
@@ -279,9 +274,12 @@ pub mod mp_utils {
     /// Get all enabled processor numbers
     pub unsafe fn get_enabled_processors(
         mp: &mut MpServicesProtocol,
-    ) -> Result<alloc::vec::Vec<usize>, Status> {
+    ) -> Result<Vec<usize>, Status> {
         #[cfg(not(feature = "std"))]
         use alloc::vec::Vec;
+
+        #[cfg(feature = "std")]
+        use std::vec::Vec;
 
         let processors = get_all_processors(mp)?;
         let mut enabled = Vec::new();

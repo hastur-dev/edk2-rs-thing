@@ -3,8 +3,8 @@
 
 #![cfg(test)]
 
-use uefi_rust::protocols::*;
 use uefi_rust::ffi::*;
+use uefi_rust::protocols::*;
 
 #[test]
 fn test_ipv4_address_creation() {
@@ -16,9 +16,7 @@ fn test_ipv4_address_creation() {
 
     assert_eq!(localhost.addr, [127, 0, 0, 1]);
 
-    let google_dns = Ipv4Address {
-        addr: [8, 8, 8, 8],
-    };
+    let google_dns = Ipv4Address { addr: [8, 8, 8, 8] };
 
     assert_eq!(google_dns.addr, [8, 8, 8, 8]);
 }
@@ -70,7 +68,9 @@ fn test_tcp_config_creation() {
             station_address: Ipv4Address { addr: [0, 0, 0, 0] },
             subnet_mask: Ipv4Address { addr: [0, 0, 0, 0] },
             station_port: 0,
-            remote_address: Ipv4Address { addr: [192, 168, 1, 1] },
+            remote_address: Ipv4Address {
+                addr: [192, 168, 1, 1],
+            },
             remote_port: 80,
             active_flag: 1,
         },
@@ -134,11 +134,17 @@ fn test_http_status_codes() {
     assert_eq!(status_code_to_int(HttpStatusCode::Http100Continue), 100);
     assert_eq!(status_code_to_int(HttpStatusCode::Http200Ok), 200);
     assert_eq!(status_code_to_int(HttpStatusCode::Http201Created), 201);
-    assert_eq!(status_code_to_int(HttpStatusCode::Http301MovedPermanently), 301);
+    assert_eq!(
+        status_code_to_int(HttpStatusCode::Http301MovedPermanently),
+        301
+    );
     assert_eq!(status_code_to_int(HttpStatusCode::Http302Found), 302);
     assert_eq!(status_code_to_int(HttpStatusCode::Http400BadRequest), 400);
     assert_eq!(status_code_to_int(HttpStatusCode::Http404NotFound), 404);
-    assert_eq!(status_code_to_int(HttpStatusCode::Http500InternalServerError), 500);
+    assert_eq!(
+        status_code_to_int(HttpStatusCode::Http500InternalServerError),
+        500
+    );
 }
 
 #[test]
@@ -258,9 +264,9 @@ fn test_port_numbers() {
 
 #[test]
 fn test_network_protocol_guids_unique() {
-    use tcp_udp::*;
-    use ip::*;
     use http::*;
+    use ip::*;
+    use tcp_udp::*;
 
     // Verify all network protocol GUIDs are unique
     assert_ne!(TCP4_PROTOCOL_GUID, TCP6_PROTOCOL_GUID);

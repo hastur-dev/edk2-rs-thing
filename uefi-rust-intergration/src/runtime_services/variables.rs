@@ -81,11 +81,7 @@ impl<'a> Variable<'a> {
     }
 
     /// Delete a variable (set with size 0)
-    pub unsafe fn delete(
-        &self,
-        variable_name: *const Char16,
-        vendor_guid: &Guid,
-    ) -> Status {
+    pub unsafe fn delete(&self, variable_name: *const Char16, vendor_guid: &Guid) -> Status {
         (self.rt.set_variable)(
             variable_name,
             vendor_guid as *const _,
@@ -96,10 +92,7 @@ impl<'a> Variable<'a> {
     }
 
     /// Query variable info
-    pub unsafe fn query_variable_info(
-        &self,
-        attributes: u32,
-    ) -> Result<(u64, u64, u64), Status> {
+    pub unsafe fn query_variable_info(&self, attributes: u32) -> Result<(u64, u64, u64), Status> {
         let mut max_storage = 0u64;
         let mut remaining_storage = 0u64;
         let mut max_variable_size = 0u64;

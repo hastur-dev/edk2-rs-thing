@@ -85,10 +85,8 @@ pub struct GraphicsOutputProtocol {
         size_of_info: *mut Uintn,
         info: *mut *mut GraphicsOutputModeInformation,
     ) -> Status,
-    pub set_mode: unsafe extern "efiapi" fn(
-        this: *mut GraphicsOutputProtocol,
-        mode_number: Uint32,
-    ) -> Status,
+    pub set_mode:
+        unsafe extern "efiapi" fn(this: *mut GraphicsOutputProtocol, mode_number: Uint32) -> Status,
     pub blt: unsafe extern "efiapi" fn(
         this: *mut GraphicsOutputProtocol,
         blt_buffer: *mut GraphicsOutputBltPixel,

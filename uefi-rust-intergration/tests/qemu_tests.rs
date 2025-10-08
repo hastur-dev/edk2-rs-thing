@@ -37,10 +37,12 @@ fn test_protocol_enumeration() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should enumerate standard protocols
-    assert!(result.stdout.contains("SimpleTextOutput") ||
-            result.stdout.contains("LoadedImage") ||
-            result.stdout.contains("Protocol"),
-            "Expected protocol enumeration in output");
+    assert!(
+        result.stdout.contains("SimpleTextOutput")
+            || result.stdout.contains("LoadedImage")
+            || result.stdout.contains("Protocol"),
+        "Expected protocol enumeration in output"
+    );
 }
 
 #[test]
@@ -59,10 +61,12 @@ fn test_memory_allocation() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should successfully allocate and free memory
-    assert!(result.stdout.contains("Allocated") ||
-            result.stdout.contains("Success") ||
-            result.exit_code == Some(0),
-            "Expected successful memory operations");
+    assert!(
+        result.stdout.contains("Allocated")
+            || result.stdout.contains("Success")
+            || result.exit_code == Some(0),
+        "Expected successful memory operations"
+    );
 }
 
 #[test]
@@ -81,10 +85,12 @@ fn test_file_operations() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should perform file operations
-    assert!(result.stdout.contains("File") ||
-            result.stdout.contains("Read") ||
-            result.stdout.contains("Write") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("File")
+            || result.stdout.contains("Read")
+            || result.stdout.contains("Write")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -106,10 +112,12 @@ fn test_graphics_output() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should find graphics output protocol
-    assert!(result.stdout.contains("Graphics") ||
-            result.stdout.contains("GOP") ||
-            result.stdout.contains("Resolution") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("Graphics")
+            || result.stdout.contains("GOP")
+            || result.stdout.contains("Resolution")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -128,10 +136,12 @@ fn test_time_services() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should get time from runtime services
-    assert!(result.stdout.contains("Time") ||
+    assert!(
+        result.stdout.contains("Time") ||
             result.stdout.contains("2025") || // Current year
             result.stdout.contains("Date") ||
-            result.exit_code == Some(0));
+            result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -150,10 +160,12 @@ fn test_variable_services() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should access UEFI variables
-    assert!(result.stdout.contains("Variable") ||
-            result.stdout.contains("BootOrder") ||
-            result.stdout.contains("ConIn") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("Variable")
+            || result.stdout.contains("BootOrder")
+            || result.stdout.contains("ConIn")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -171,15 +183,19 @@ fn test_block_io() {
     let mut config = QemuConfig::default();
     // Add a test disk
     config.extra_args.push("-drive".to_string());
-    config.extra_args.push("file=/tmp/test.img,format=raw,if=virtio".to_string());
+    config
+        .extra_args
+        .push("file=/tmp/test.img,format=raw,if=virtio".to_string());
 
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should find block I/O devices
-    assert!(result.stdout.contains("Block") ||
-            result.stdout.contains("Disk") ||
-            result.stdout.contains("Media") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("Block")
+            || result.stdout.contains("Disk")
+            || result.stdout.contains("Media")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -204,10 +220,12 @@ fn test_simple_network() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should find network interfaces
-    assert!(result.stdout.contains("Network") ||
-            result.stdout.contains("MAC") ||
-            result.stdout.contains("Interface") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("Network")
+            || result.stdout.contains("MAC")
+            || result.stdout.contains("Interface")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -226,11 +244,13 @@ fn test_acpi_tables() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should find ACPI tables
-    assert!(result.stdout.contains("ACPI") ||
-            result.stdout.contains("RSDP") ||
-            result.stdout.contains("XSDT") ||
-            result.stdout.contains("FADT") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("ACPI")
+            || result.stdout.contains("RSDP")
+            || result.stdout.contains("XSDT")
+            || result.stdout.contains("FADT")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -249,10 +269,12 @@ fn test_smbios_tables() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should find SMBIOS tables
-    assert!(result.stdout.contains("SMBIOS") ||
-            result.stdout.contains("BIOS") ||
-            result.stdout.contains("System") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("SMBIOS")
+            || result.stdout.contains("BIOS")
+            || result.stdout.contains("System")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -271,10 +293,12 @@ fn test_pci_enumeration() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should enumerate PCI devices
-    assert!(result.stdout.contains("PCI") ||
-            result.stdout.contains("Device") ||
-            result.stdout.contains("Vendor") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("PCI")
+            || result.stdout.contains("Device")
+            || result.stdout.contains("Vendor")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -295,9 +319,11 @@ fn test_boot_from_disk() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should complete boot sequence
-    assert!(result.stdout.contains("Boot") ||
-            result.stdout.contains("Started") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("Boot")
+            || result.stdout.contains("Started")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -316,9 +342,11 @@ fn test_exit_boot_services() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should successfully exit boot services
-    assert!(result.stdout.contains("ExitBootServices") ||
-            result.stdout.contains("Runtime") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("ExitBootServices")
+            || result.stdout.contains("Runtime")
+            || result.exit_code == Some(0)
+    );
 }
 
 #[test]
@@ -363,8 +391,10 @@ fn test_multiprocessor_services() {
     let result = run_in_qemu(&efi_path, &config).expect("Failed to run in QEMU");
 
     // Should detect multiple processors
-    assert!(result.stdout.contains("Processor") ||
-            result.stdout.contains("CPU") ||
-            result.stdout.contains("Core") ||
-            result.exit_code == Some(0));
+    assert!(
+        result.stdout.contains("Processor")
+            || result.stdout.contains("CPU")
+            || result.stdout.contains("Core")
+            || result.exit_code == Some(0)
+    );
 }

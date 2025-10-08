@@ -7,11 +7,11 @@
 
 mod mock_environment;
 
+use mock_environment::*;
 use uefi_rust::ffi::*;
+use uefi_rust::guid::*;
 use uefi_rust::protocols::*;
 use uefi_rust::string::*;
-use uefi_rust::guid::*;
-use mock_environment::*;
 
 #[test]
 fn test_string_round_trip_conversion() {
@@ -224,8 +224,7 @@ fn test_protocol_installation_and_lookup() {
     // Locate protocols
     let found_text: Option<*mut MockSimpleTextOutput> =
         env.locate_protocol(&SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID);
-    let found_block: Option<*mut MockBlockIo> =
-        env.locate_protocol(&BLOCK_IO_PROTOCOL_GUID);
+    let found_block: Option<*mut MockBlockIo> = env.locate_protocol(&BLOCK_IO_PROTOCOL_GUID);
 
     assert!(found_text.is_some());
     assert!(found_block.is_some());
@@ -309,8 +308,14 @@ fn test_comprehensive_environment_setup() {
 
     // Install all major protocol types
     let protocols = vec![
-        (SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID, Box::into_raw(Box::new(MockSimpleTextOutput::new())) as *mut core::ffi::c_void),
-        (BLOCK_IO_PROTOCOL_GUID, Box::into_raw(Box::new(MockBlockIo::new(100, 512))) as *mut core::ffi::c_void),
+        (
+            SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID,
+            Box::into_raw(Box::new(MockSimpleTextOutput::new())) as *mut core::ffi::c_void,
+        ),
+        (
+            BLOCK_IO_PROTOCOL_GUID,
+            Box::into_raw(Box::new(MockBlockIo::new(100, 512))) as *mut core::ffi::c_void,
+        ),
     ];
 
     for (guid, ptr) in &protocols {
@@ -318,8 +323,12 @@ fn test_comprehensive_environment_setup() {
     }
 
     // Verify all are accessible
-    assert!(env.locate_protocol::<MockSimpleTextOutput>(&SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID).is_some());
-    assert!(env.locate_protocol::<MockBlockIo>(&BLOCK_IO_PROTOCOL_GUID).is_some());
+    assert!(env
+        .locate_protocol::<MockSimpleTextOutput>(&SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID)
+        .is_some());
+    assert!(env
+        .locate_protocol::<MockBlockIo>(&BLOCK_IO_PROTOCOL_GUID)
+        .is_some());
 
     // Cleanup
     for (_, ptr) in protocols {

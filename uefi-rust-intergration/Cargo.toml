@@ -20,6 +20,7 @@ test = false
 [features]
 default = []
 std = []
+soft-float = []
 
 [profile.dev]
 panic = "abort"
