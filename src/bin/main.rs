@@ -1,27 +1,18 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! UEFI Application Entry Point
 
-#![cfg_attr(not(feature = "std"), no_std)]
-#![cfg_attr(not(feature = "std"), no_main)]
-#![cfg_attr(not(feature = "std"), feature(alloc_error_handler))]
+#![no_std]
+#![no_main]
+#![feature(alloc_error_handler)]
 
-#[cfg(not(feature = "std"))]
 extern crate alloc;
 
-#[cfg(feature = "std")]
-fn main() {
-    // Stub main for testing
-}
-
-use uefi_rust_intergration::*;
-
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+use uefi_rust_intergration::*;
 
 /// UEFI Application Entry Point
 ///
 /// This is the standard UEFI entry point signature
-#[cfg(not(feature = "std"))]
 #[no_mangle]
 pub extern "efiapi" fn efi_main(
     _image_handle: *mut Handle,
@@ -55,7 +46,6 @@ pub extern "efiapi" fn efi_main(
 }
 
 /// Helper function to print a string to UEFI console
-#[cfg(not(feature = "std"))]
 unsafe fn print_string(st: &SystemTable, msg: &str) {
     let stdout = st.stdout();
 

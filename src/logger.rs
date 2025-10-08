@@ -100,7 +100,6 @@ struct ConsoleWriter {
 
 impl Write for ConsoleWriter {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        #[cfg(not(feature = "std"))]
         use alloc::vec::Vec;
 
         let ucs2: Vec<u16> = s.encode_utf16().chain(core::iter::once(0)).collect();

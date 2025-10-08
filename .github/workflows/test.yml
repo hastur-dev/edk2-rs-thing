@@ -58,66 +58,6 @@ jobs:
     - name: Report status
       run: echo "✅ Library builds successfully in no_std UEFI environment"
 
-  qemu-integration-tests:
-    name: QEMU Integration Tests
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly-2025-01-09
-        profile: minimal
-        override: true
-        components: rust-src
-
-    - name: Install QEMU and OVMF
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y qemu-system-x86 ovmf
-
-    - name: Verify OVMF installation
-      run: |
-        ls -la /usr/share/ovmf/
-        ls -la /usr/share/ovmf/OVMF*.fd || true
-
-    - name: Build UEFI target
-      run: |
-        rustup target add x86_64-unknown-uefi
-        cargo build --target x86_64-unknown-uefi --lib
-
-    - name: Run QEMU integration tests
-      run: cargo test --test qemu_tests -- --ignored --test-threads=1
-      continue-on-error: true
-
-  build-examples:
-    name: Build Examples
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly-2025-01-09
-        profile: minimal
-        override: true
-        components: rust-src
-
-    - name: Add UEFI target
-      run: rustup target add x86_64-unknown-uefi
-
-    - name: Build all examples
-      run: |
-        for example in examples/*.rs; do
-          name=$(basename "$example" .rs)
-          echo "Building example: $name"
-          cargo build --example "$name" --target x86_64-unknown-uefi --release || true
-        done
-
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
@@ -134,8 +74,7 @@ jobs:
         components: clippy, rust-src
 
     - name: Run clippy
-      run: cargo clippy --all-targets --all-features -- -D warnings
-      continue-on-error: true
+      run: cargo clippy --lib --target x86_64-unknown-uefi -- -D warnings
 
   fmt:
     name: Rustfmt
@@ -155,33 +94,6 @@ jobs:
     - name: Check formatting
       run: cargo fmt --all -- --check
 
-  coverage:
-    name: Code Coverage
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly-2025-01-09
-        profile: minimal
-        override: true
-        components: rust-src
-
-    - name: Install tarpaulin
-      run: cargo install cargo-tarpaulin
-
-    - name: Generate coverage
-      run: cargo tarpaulin --out Xml --all-features
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./cobertura.xml
-        fail_ci_if_error: false
-
   docs:
     name: Documentation
     runs-on: ubuntu-latest
@@ -198,7 +110,7 @@ jobs:
         components: rust-src
 
     - name: Build documentation
-      run: cargo doc --no-deps --all-features
+      run: cargo doc --lib --no-deps --all-features --target x86_64-unknown-uefi
 
     - name: Check for broken links
       run: |

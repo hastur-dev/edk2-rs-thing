@@ -3,11 +3,7 @@
 
 use crate::ffi::*;
 
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
-
-#[cfg(feature = "std")]
-use std::vec::Vec;
 
 /// EFI_DRIVER_BINDING_PROTOCOL_GUID
 pub const DRIVER_BINDING_PROTOCOL_GUID: Guid = Guid::new(

@@ -3,11 +3,7 @@
 
 use crate::ffi::*;
 
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
-
-#[cfg(feature = "std")]
-use std::vec::Vec;
 
 /// EFI_FIRMWARE_MANAGEMENT_PROTOCOL_GUID
 pub const FIRMWARE_MANAGEMENT_PROTOCOL_GUID: Guid = Guid::new(
@@ -118,9 +114,6 @@ impl FirmwareManagementProtocol {
     pub unsafe fn get_image_info(
         &mut self,
     ) -> Result<(Vec<FirmwareImageDescriptor>, u32, u32), Status> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
         let mut image_info_size = 0;
         let mut descriptor_version = 0u32;
         let mut descriptor_count = 0u8;

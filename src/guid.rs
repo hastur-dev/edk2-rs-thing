@@ -2,7 +2,6 @@
 //! GUID Management Utilities
 
 use crate::ffi::Guid;
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 /// Helper macro to define a GUID constant

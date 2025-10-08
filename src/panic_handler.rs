@@ -3,15 +3,9 @@
 
 #[cfg(not(test))]
 use crate::ffi::*;
-#[cfg(not(test))]
 use crate::protocols::SimpleTextOutputProtocol;
-#[cfg(not(test))]
 use core::fmt::Write;
-#[cfg(all(not(test), not(feature = "std")))]
 use core::panic::PanicInfo;
-
-#[cfg(test)]
-use crate::protocols::SimpleTextOutputProtocol;
 
 static mut CONSOLE_OUT: Option<*mut SimpleTextOutputProtocol> = None;
 
@@ -32,7 +26,6 @@ struct PanicWriter {
 #[cfg(not(test))]
 impl core::fmt::Write for PanicWriter {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        #[cfg(not(feature = "std"))]
         use alloc::vec::Vec;
 
         if self.console.is_null() {
@@ -54,7 +47,6 @@ impl core::fmt::Write for PanicWriter {
 }
 
 /// Enhanced panic handler with console output
-#[cfg(not(feature = "std"))]
 pub fn panic_handler(info: &PanicInfo) -> ! {
     unsafe {
         if let Some(console) = CONSOLE_OUT {

@@ -4,10 +4,10 @@
 //! This library provides BSD-2-Clause-Patent licensed bindings and abstractions
 //! for UEFI firmware development in Rust.
 
-#![cfg_attr(not(feature = "std"), no_std)]
-#![cfg_attr(not(feature = "std"), feature(alloc_error_handler))]
-#![cfg_attr(not(feature = "std"), allow(internal_features))]
-#![cfg_attr(not(feature = "std"), feature(lang_items))]
+#![no_std]
+#![feature(alloc_error_handler)]
+#![allow(internal_features)]
+#![feature(lang_items)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(improper_ctypes_definitions)]
 #![allow(clippy::mut_from_ref)]
@@ -20,7 +20,6 @@
 #![cfg_attr(test, allow(clippy::field_reassign_with_default))]
 #![cfg_attr(test, allow(clippy::unnecessary_unwrap))]
 
-#[cfg(not(feature = "std"))]
 extern crate alloc;
 
 pub mod allocator;
@@ -41,18 +40,15 @@ pub mod tables;
 pub use ffi::*;
 pub use system_table::SystemTable;
 
-#[cfg(not(feature = "std"))]
 use core::panic::PanicInfo;
 
 /// Panic handler for no_std environment
-#[cfg(not(feature = "std"))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     panic_handler::panic_handler(info)
 }
 
 /// Language item for eh_personality
-#[cfg(not(feature = "std"))]
 #[lang = "eh_personality"]
 extern "C" fn eh_personality() {}
 

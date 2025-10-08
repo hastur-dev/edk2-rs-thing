@@ -90,7 +90,7 @@ jobs:
     - name: Check documentation coverage
       run: |
         echo "Checking for undocumented public items..."
-        cargo +nightly-2025-01-09 doc --lib --no-deps --document-private-items 2>&1 | \
+        cargo +nightly-2025-01-09 doc --lib --no-deps --document-private-items --target x86_64-unknown-uefi 2>&1 | \
           tee doc_output.txt || true
         if grep -q "warning: missing documentation" doc_output.txt; then
           echo "⚠️ Some items lack documentation (this is OK for PR, but consider adding)"

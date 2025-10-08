@@ -12,14 +12,8 @@ name = "uefi-app"
 path = "src/bin/main.rs"
 test = false
 
-[[bin]]
-name = "hello-protocols"
-path = "src/bin/hello_protocols.rs"
-test = false
-
 [features]
 default = []
-std = []
 soft-float = []
 
 [profile.dev]

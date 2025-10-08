@@ -2,9 +2,7 @@
 //! UEFI String Utilities - UCS-2/UTF-16 conversion and manipulation
 
 use crate::ffi::*;
-#[cfg(not(feature = "std"))]
 use alloc::string::String;
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 /// Convert a Rust string slice to a null-terminated UCS-2 (Char16) vector

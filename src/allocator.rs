@@ -83,11 +83,9 @@ unsafe impl GlobalAlloc for UefiAllocator {
     }
 }
 
-#[cfg(not(feature = "std"))]
 #[global_allocator]
 static ALLOCATOR: UefiAllocator = UefiAllocator;
 
-#[cfg(not(feature = "std"))]
 #[alloc_error_handler]
 fn alloc_error_handler(layout: Layout) -> ! {
     panic!("Allocation error: {:?}", layout);

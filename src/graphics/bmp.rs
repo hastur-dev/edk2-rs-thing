@@ -3,11 +3,7 @@
 
 use crate::protocols::graphics_output::*;
 
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
-
-#[cfg(feature = "std")]
-use std::vec::Vec;
 
 /// BMP File Header
 #[repr(C, packed)]
@@ -123,9 +119,6 @@ impl<'a> BmpImage<'a> {
 
     /// Convert BMP to GOP BLT buffer
     pub fn to_blt_buffer(&self) -> Result<(Vec<GraphicsOutputBltPixel>, u32, u32), BmpError> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
         // Only support 24-bit RGB for now
         if self.info_header.bits_per_pixel != 24 {
             return Err(BmpError::UnsupportedFormat);
@@ -184,9 +177,6 @@ impl<'a> BmpImage<'a> {
         target_width: u32,
         target_height: u32,
     ) -> Result<Vec<GraphicsOutputBltPixel>, BmpError> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
         let (blt_buffer, width, height) = self.to_blt_buffer()?;
 
         if width == target_width && height == target_height {
@@ -217,9 +207,6 @@ pub fn blt_to_bmp(
     width: u32,
     height: u32,
 ) -> Result<Vec<u8>, BmpError> {
-    #[cfg(not(feature = "std"))]
-    use alloc::vec::Vec;
-
     if width == 0 || height == 0 {
         return Err(BmpError::InvalidDimensions);
     }
@@ -299,9 +286,6 @@ mod tests {
 
     #[test]
     fn test_bmp_round_trip() {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
         // Create a simple 2x2 image
         let blt_buffer = vec![
             GraphicsOutputBltPixel {
