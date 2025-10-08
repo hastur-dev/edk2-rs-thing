@@ -538,6 +538,553 @@ pub mod gpt_partition_types {
     );
 }
 
+// ============================================================================
+// Safe Wrappers
+// ============================================================================
+
+/// Safe wrapper for SCSI Pass Thru Protocol
+pub struct SafeScsiPassThru<'a> {
+    protocol: &'a mut ScsiPassThruProtocol,
+}
+
+impl<'a> SafeScsiPassThru<'a> {
+    /// Create a new safe wrapper
+    pub fn new(protocol: &'a mut ScsiPassThruProtocol) -> Self {
+        Self { protocol }
+    }
+
+    /// Send a SCSI command to target device
+    pub fn send_command(
+        &mut self,
+        target: u32,
+        lun: u64,
+        packet: &mut ScsiPassThruRequestPacket,
+    ) -> Result<(), Status> {
+        let status = unsafe { self.protocol.pass_thru(target, lun, packet) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Get mode information
+    pub fn mode(&self) -> Result<&ScsiPassThruMode, Status> {
+        if self.protocol.mode.is_null() {
+            Err(EFI_DEVICE_ERROR)
+        } else {
+            Ok(unsafe { &*self.protocol.mode })
+        }
+    }
+
+    /// Reset the SCSI channel
+    pub fn reset_channel(&mut self) -> Result<(), Status> {
+        let status = unsafe { (self.protocol.reset_channel)(self.protocol) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Reset specific SCSI target
+    pub fn reset_target(&mut self, target: u32, lun: u64) -> Result<(), Status> {
+        let status = unsafe { (self.protocol.reset_target)(self.protocol, target, lun) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Iterator over SCSI devices
+    pub fn devices(&mut self) -> ScsiDeviceIterator {
+        ScsiDeviceIterator {
+            protocol: self.protocol,
+            target: 0xFFFFFFFF,
+            lun: 0xFFFFFFFFFFFFFFFF,
+            first: true,
+        }
+    }
+}
+
+/// Iterator over SCSI devices
+pub struct ScsiDeviceIterator<'a> {
+    protocol: &'a mut ScsiPassThruProtocol,
+    target: u32,
+    lun: u64,
+    first: bool,
+}
+
+impl<'a> Iterator for ScsiDeviceIterator<'a> {
+    type Item = (u32, u64);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.first {
+            self.first = false;
+        }
+
+        let status = unsafe { self.protocol.get_next_device(&mut self.target, &mut self.lun) };
+
+        if status == EFI_SUCCESS {
+            Some((self.target, self.lun))
+        } else {
+            None
+        }
+    }
+}
+
+/// Safe wrapper for NVMe Pass Thru Protocol
+pub struct SafeNvmePassThru<'a> {
+    protocol: &'a mut NvmExpressPassThruProtocol,
+}
+
+impl<'a> SafeNvmePassThru<'a> {
+    /// Create a new safe wrapper
+    pub fn new(protocol: &'a mut NvmExpressPassThruProtocol) -> Self {
+        Self { protocol }
+    }
+
+    /// Send an NVMe command
+    pub fn send_command(
+        &mut self,
+        namespace_id: u32,
+        packet: &mut NvmePassThruCommandPacket,
+    ) -> Result<(), Status> {
+        let status = unsafe { self.protocol.pass_thru(namespace_id, packet) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Get mode information
+    pub fn mode(&self) -> Result<&NvmExpressPassThruMode, Status> {
+        if self.protocol.mode.is_null() {
+            Err(EFI_DEVICE_ERROR)
+        } else {
+            Ok(unsafe { &*self.protocol.mode })
+        }
+    }
+
+    /// Iterator over NVMe namespaces
+    pub fn namespaces(&mut self) -> NvmeNamespaceIterator {
+        NvmeNamespaceIterator {
+            protocol: self.protocol,
+            namespace_id: 0xFFFFFFFF,
+            first: true,
+        }
+    }
+
+    /// Send NVMe Identify Controller command
+    pub fn identify_controller(&mut self, buffer: &mut [u8; 4096]) -> Result<(), Status> {
+        let mut cmd = NvmeCommand {
+            cdw0: 0x06, // Identify command
+            flags: 0,
+            nsid: 0,
+            cdw2: 0,
+            cdw3: 0,
+            cdw10: 0x01, // Controller structure
+            cdw11: 0,
+            cdw12: 0,
+            cdw13: 0,
+            cdw14: 0,
+            cdw15: 0,
+        };
+
+        let mut completion = NvmeCompletion {
+            dw0: 0,
+            dw1: 0,
+            dw2: 0,
+            dw3: 0,
+        };
+
+        let mut packet = NvmePassThruCommandPacket {
+            command_timeout: 1_000_000, // 1 second
+            transfer_buffer: buffer.as_mut_ptr() as *mut _,
+            transfer_length: 4096,
+            metadata_buffer: core::ptr::null_mut(),
+            metadata_length: 0,
+            queue_type: 0, // Admin queue
+            nvme_cmd: &mut cmd,
+            nvme_completion: &mut completion,
+        };
+
+        self.send_command(0, &mut packet)
+    }
+
+    /// Send NVMe Identify Namespace command
+    pub fn identify_namespace(&mut self, namespace_id: u32, buffer: &mut [u8; 4096]) -> Result<(), Status> {
+        let mut cmd = NvmeCommand {
+            cdw0: 0x06, // Identify command
+            flags: 0,
+            nsid: namespace_id,
+            cdw2: 0,
+            cdw3: 0,
+            cdw10: 0x00, // Namespace structure
+            cdw11: 0,
+            cdw12: 0,
+            cdw13: 0,
+            cdw14: 0,
+            cdw15: 0,
+        };
+
+        let mut completion = NvmeCompletion {
+            dw0: 0,
+            dw1: 0,
+            dw2: 0,
+            dw3: 0,
+        };
+
+        let mut packet = NvmePassThruCommandPacket {
+            command_timeout: 1_000_000,
+            transfer_buffer: buffer.as_mut_ptr() as *mut _,
+            transfer_length: 4096,
+            metadata_buffer: core::ptr::null_mut(),
+            metadata_length: 0,
+            queue_type: 0,
+            nvme_cmd: &mut cmd,
+            nvme_completion: &mut completion,
+        };
+
+        self.send_command(namespace_id, &mut packet)
+    }
+}
+
+/// Iterator over NVMe namespaces
+pub struct NvmeNamespaceIterator<'a> {
+    protocol: &'a mut NvmExpressPassThruProtocol,
+    namespace_id: u32,
+    first: bool,
+}
+
+impl<'a> Iterator for NvmeNamespaceIterator<'a> {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.first {
+            self.first = false;
+        }
+
+        let status = unsafe { self.protocol.get_next_namespace(&mut self.namespace_id) };
+
+        if status == EFI_SUCCESS {
+            Some(self.namespace_id)
+        } else {
+            None
+        }
+    }
+}
+
+/// Safe wrapper for Disk I/O Protocol
+pub struct SafeDiskIo<'a> {
+    protocol: &'a mut DiskIoProtocol,
+}
+
+impl<'a> SafeDiskIo<'a> {
+    /// Create a new safe wrapper
+    pub fn new(protocol: &'a mut DiskIoProtocol) -> Self {
+        Self { protocol }
+    }
+
+    /// Read from disk at byte offset
+    pub fn read(&mut self, media_id: u32, offset: u64, buffer: &mut [u8]) -> Result<(), Status> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let status = unsafe { self.protocol.read_disk(media_id, offset, buffer) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Write to disk at byte offset
+    pub fn write(&mut self, media_id: u32, offset: u64, buffer: &[u8]) -> Result<(), Status> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let status = unsafe { self.protocol.write_disk(media_id, offset, buffer) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Get revision
+    pub fn revision(&self) -> u64 {
+        self.protocol.revision
+    }
+}
+
+/// Safe wrapper for Disk I/O 2 Protocol (async operations)
+pub struct SafeDiskIo2<'a> {
+    protocol: &'a mut DiskIo2Protocol,
+}
+
+impl<'a> SafeDiskIo2<'a> {
+    /// Create a new safe wrapper
+    pub fn new(protocol: &'a mut DiskIo2Protocol) -> Self {
+        Self { protocol }
+    }
+
+    /// Read from disk asynchronously
+    pub fn read_async(
+        &mut self,
+        media_id: u32,
+        offset: u64,
+        token: &mut DiskIo2Token,
+        buffer: &mut [u8],
+    ) -> Result<(), Status> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let status = unsafe { self.protocol.read_disk_ex(media_id, offset, token, buffer) };
+        if status == EFI_SUCCESS || status == EFI_NOT_READY {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Write to disk asynchronously
+    pub fn write_async(
+        &mut self,
+        media_id: u32,
+        offset: u64,
+        token: &mut DiskIo2Token,
+        buffer: &[u8],
+    ) -> Result<(), Status> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let status = unsafe { self.protocol.write_disk_ex(media_id, offset, token, buffer) };
+        if status == EFI_SUCCESS || status == EFI_NOT_READY {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Flush disk cache
+    pub fn flush(&mut self, token: &mut DiskIo2Token) -> Result<(), Status> {
+        let status = unsafe { self.protocol.flush_disk_ex(token) };
+        if status == EFI_SUCCESS || status == EFI_NOT_READY {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Cancel all pending operations
+    pub fn cancel(&mut self) -> Result<(), Status> {
+        let status = unsafe { (self.protocol.cancel)(self.protocol) };
+        if status == EFI_SUCCESS {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    /// Get revision
+    pub fn revision(&self) -> u64 {
+        self.protocol.revision
+    }
+}
+
+/// Safe wrapper for Partition Info Protocol
+pub struct SafePartitionInfo<'a> {
+    protocol: &'a PartitionInfoProtocol,
+}
+
+impl<'a> SafePartitionInfo<'a> {
+    /// Create a new safe wrapper
+    pub fn new(protocol: &'a PartitionInfoProtocol) -> Self {
+        Self { protocol }
+    }
+
+    /// Get partition information
+    pub fn info(&self) -> &PartitionInfo {
+        &self.protocol.info
+    }
+
+    /// Get partition type
+    pub fn partition_type(&self) -> PartitionType {
+        self.protocol.info.partition_type
+    }
+
+    /// Check if this is a system partition
+    pub fn is_system_partition(&self) -> bool {
+        self.protocol.info.system != 0
+    }
+
+    /// Get MBR partition information if this is an MBR partition
+    pub fn mbr_info(&self) -> Option<&MbrPartitionRecord> {
+        if self.protocol.info.partition_type == PartitionType::Mbr {
+            Some(unsafe { &self.protocol.info.info.mbr })
+        } else {
+            None
+        }
+    }
+
+    /// Get GPT partition information if this is a GPT partition
+    pub fn gpt_info(&self) -> Option<&GptPartitionEntry> {
+        if self.protocol.info.partition_type == PartitionType::Gpt {
+            Some(unsafe { &self.protocol.info.info.gpt })
+        } else {
+            None
+        }
+    }
+
+    /// Get GPT partition type GUID
+    pub fn gpt_partition_type_guid(&self) -> Option<Guid> {
+        self.gpt_info().map(|gpt| gpt.partition_type_guid)
+    }
+
+    /// Get GPT unique partition GUID
+    pub fn gpt_unique_partition_guid(&self) -> Option<Guid> {
+        self.gpt_info().map(|gpt| gpt.unique_partition_guid)
+    }
+
+    /// Get partition name (GPT only)
+    pub fn partition_name(&self) -> Option<&[Char16]> {
+        self.gpt_info().map(|gpt| {
+            // Find null terminator
+            let len = gpt.partition_name.iter()
+                .position(|&c| c == 0)
+                .unwrap_or(gpt.partition_name.len());
+            &gpt.partition_name[..len]
+        })
+    }
+
+    /// Get revision
+    pub fn revision(&self) -> u64 {
+        self.protocol.revision
+    }
+}
+
+/// SCSI Command Builder helpers
+pub mod scsi_builder {
+    use super::*;
+
+    /// Build a SCSI INQUIRY command packet
+    pub fn build_inquiry(
+        buffer: &mut [u8],
+        timeout: u64,
+    ) -> (ScsiPassThruRequestPacket, [u8; 6]) {
+        let cdb = [
+            scsi_commands::SCSI_INQUIRY, // Opcode
+            0x00,                         // EVPD=0
+            0x00,                         // Page code
+            0x00,                         // Reserved
+            buffer.len() as u8,           // Allocation length
+            0x00,                         // Control
+        ];
+
+        let packet = ScsiPassThruRequestPacket {
+            timeout,
+            in_data_buffer: buffer.as_mut_ptr() as *mut _,
+            out_data_buffer: core::ptr::null_mut(),
+            sense_data: core::ptr::null_mut(),
+            cdb: core::ptr::null_mut(), // Will be set by caller
+            in_transfer_length: buffer.len() as u32,
+            out_transfer_length: 0,
+            cdb_length: 6,
+            data_direction: SCSI_DATA_IN,
+            host_adapter_status: 0,
+            target_status: 0,
+            sense_data_length: 0,
+        };
+
+        (packet, cdb)
+    }
+
+    /// Build a SCSI READ(10) command packet
+    pub fn build_read10(
+        lba: u32,
+        buffer: &mut [u8],
+        timeout: u64,
+    ) -> (ScsiPassThruRequestPacket, [u8; 10]) {
+        let blocks = (buffer.len() / 512) as u16;
+
+        let cdb = [
+            scsi_commands::SCSI_READ_10,  // Opcode
+            0x00,                          // Flags
+            (lba >> 24) as u8,             // LBA
+            (lba >> 16) as u8,
+            (lba >> 8) as u8,
+            lba as u8,
+            0x00,                          // Group number
+            (blocks >> 8) as u8,           // Transfer length
+            blocks as u8,
+            0x00,                          // Control
+        ];
+
+        let packet = ScsiPassThruRequestPacket {
+            timeout,
+            in_data_buffer: buffer.as_mut_ptr() as *mut _,
+            out_data_buffer: core::ptr::null_mut(),
+            sense_data: core::ptr::null_mut(),
+            cdb: core::ptr::null_mut(),
+            in_transfer_length: buffer.len() as u32,
+            out_transfer_length: 0,
+            cdb_length: 10,
+            data_direction: SCSI_DATA_IN,
+            host_adapter_status: 0,
+            target_status: 0,
+            sense_data_length: 0,
+        };
+
+        (packet, cdb)
+    }
+
+    /// Build a SCSI WRITE(10) command packet
+    pub fn build_write10(
+        lba: u32,
+        buffer: &[u8],
+        timeout: u64,
+    ) -> (ScsiPassThruRequestPacket, [u8; 10]) {
+        let blocks = (buffer.len() / 512) as u16;
+
+        let cdb = [
+            scsi_commands::SCSI_WRITE_10, // Opcode
+            0x00,                          // Flags
+            (lba >> 24) as u8,             // LBA
+            (lba >> 16) as u8,
+            (lba >> 8) as u8,
+            lba as u8,
+            0x00,                          // Group number
+            (blocks >> 8) as u8,           // Transfer length
+            blocks as u8,
+            0x00,                          // Control
+        ];
+
+        let packet = ScsiPassThruRequestPacket {
+            timeout,
+            in_data_buffer: core::ptr::null_mut(),
+            out_data_buffer: buffer.as_ptr() as *mut _,
+            sense_data: core::ptr::null_mut(),
+            cdb: core::ptr::null_mut(),
+            in_transfer_length: 0,
+            out_transfer_length: buffer.len() as u32,
+            cdb_length: 10,
+            data_direction: SCSI_DATA_OUT,
+            host_adapter_status: 0,
+            target_status: 0,
+            sense_data_length: 0,
+        };
+
+        (packet, cdb)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -553,5 +1100,31 @@ mod tests {
     fn test_partition_type() {
         assert_eq!(PartitionType::Mbr as u32, 1);
         assert_eq!(PartitionType::Gpt as u32, 2);
+    }
+
+    #[test]
+    fn test_scsi_builder_inquiry() {
+        let mut buffer = [0u8; 36];
+        let (packet, cdb) = scsi_builder::build_inquiry(&mut buffer, 1_000_000);
+
+        assert_eq!(cdb[0], scsi_commands::SCSI_INQUIRY);
+        assert_eq!(packet.cdb_length, 6);
+        assert_eq!(packet.data_direction, SCSI_DATA_IN);
+        assert_eq!(packet.in_transfer_length, 36);
+    }
+
+    #[test]
+    fn test_scsi_builder_read10() {
+        let mut buffer = [0u8; 512];
+        let (packet, cdb) = scsi_builder::build_read10(100, &mut buffer, 1_000_000);
+
+        assert_eq!(cdb[0], scsi_commands::SCSI_READ_10);
+        assert_eq!(packet.cdb_length, 10);
+        assert_eq!(packet.data_direction, SCSI_DATA_IN);
+
+        // Check LBA encoding
+        let lba = ((cdb[2] as u32) << 24) | ((cdb[3] as u32) << 16)
+                | ((cdb[4] as u32) << 8) | (cdb[5] as u32);
+        assert_eq!(lba, 100);
     }
 }
