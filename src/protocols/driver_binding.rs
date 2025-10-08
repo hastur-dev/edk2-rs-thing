@@ -196,9 +196,6 @@ impl DriverDiagnostics2Protocol {
         diagnostic_type: DiagnosticsType,
         language: &[u8],
     ) -> Result<(Guid, Vec<u16>), Status> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
         let mut error_type = core::ptr::null_mut();
         let mut buffer_size = 0;
         let mut buffer = core::ptr::null_mut();

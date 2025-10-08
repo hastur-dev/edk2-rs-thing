@@ -6,6 +6,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(not(feature = "std"), feature(alloc_error_handler))]
+#![cfg_attr(not(feature = "std"), allow(internal_features))]
 #![cfg_attr(not(feature = "std"), feature(lang_items))]
 #![allow(clippy::missing_safety_doc)]
 #![allow(improper_ctypes_definitions)]
@@ -18,7 +19,6 @@
 #![cfg_attr(test, allow(clippy::useless_transmute))]
 #![cfg_attr(test, allow(clippy::field_reassign_with_default))]
 #![cfg_attr(test, allow(clippy::unnecessary_unwrap))]
-#![cfg_attr(test, allow(clippy::needless_parens))]
 
 #[cfg(not(feature = "std"))]
 extern crate alloc;

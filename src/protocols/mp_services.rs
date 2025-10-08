@@ -3,6 +3,12 @@
 
 use crate::ffi::*;
 
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::vec::Vec;
+
 /// EFI_MP_SERVICES_PROTOCOL_GUID
 pub const MP_SERVICES_PROTOCOL_GUID: Guid = Guid::new(
     0x3fdda605,
@@ -239,12 +245,6 @@ pub mod mp_utils {
     pub unsafe fn get_all_processors(
         mp: &mut MpServicesProtocol,
     ) -> Result<Vec<ProcessorInformation>, Status> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
-        #[cfg(feature = "std")]
-        use std::vec::Vec;
-
         let (total, _) = mp.get_number_of_processors()?;
         let mut processors = Vec::with_capacity(total);
 
@@ -275,12 +275,6 @@ pub mod mp_utils {
     pub unsafe fn get_enabled_processors(
         mp: &mut MpServicesProtocol,
     ) -> Result<Vec<usize>, Status> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
-        #[cfg(feature = "std")]
-        use std::vec::Vec;
-
         let processors = get_all_processors(mp)?;
         let mut enabled = Vec::new();
 

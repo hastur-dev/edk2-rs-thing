@@ -5,6 +5,8 @@
 use crate::ffi::*;
 #[cfg(not(test))]
 use crate::protocols::SimpleTextOutputProtocol;
+#[cfg(not(test))]
+use core::fmt::Write;
 #[cfg(all(not(test), not(feature = "std")))]
 use core::panic::PanicInfo;
 

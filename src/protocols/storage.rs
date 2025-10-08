@@ -604,7 +604,7 @@ pub struct ScsiDeviceIterator<'a> {
     first: bool,
 }
 
-impl<'a> Iterator for ScsiDeviceIterator<'a> {
+impl Iterator for ScsiDeviceIterator<'_> {
     type Item = (u32, u64);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -754,7 +754,7 @@ pub struct NvmeNamespaceIterator<'a> {
     first: bool,
 }
 
-impl<'a> Iterator for NvmeNamespaceIterator<'a> {
+impl Iterator for NvmeNamespaceIterator<'_> {
     type Item = u32;
 
     fn next(&mut self) -> Option<Self::Item> {

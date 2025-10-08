@@ -3,6 +3,12 @@
 
 use crate::ffi::*;
 
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::vec::Vec;
+
 /// EFI_TIMESTAMP_PROTOCOL_GUID
 pub const TIMESTAMP_PROTOCOL_GUID: Guid = Guid::new(
     0xafbfde41,
@@ -142,12 +148,6 @@ impl TimestampProtocol {
 impl RngProtocol {
     /// Get list of supported RNG algorithms
     pub unsafe fn get_info(&mut self) -> Result<Vec<Guid>, Status> {
-        #[cfg(not(feature = "std"))]
-        use alloc::vec::Vec;
-
-        #[cfg(feature = "std")]
-        use std::vec::Vec;
-
         let mut size = 0;
 
         // First call to get size

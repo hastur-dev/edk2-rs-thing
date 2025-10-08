@@ -201,8 +201,6 @@ impl HttpProtocol {
 /// Helper functions for HTTP
 pub mod http_helpers {
     use super::*;
-    #[cfg(not(feature = "std"))]
-    use alloc::vec::Vec;
 
     /// Create a simple GET request
     pub unsafe fn create_get_request(url: &[u16]) -> HttpRequestData {

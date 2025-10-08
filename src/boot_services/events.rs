@@ -121,7 +121,7 @@ impl<'a> EventWrapper<'a> {
     }
 }
 
-impl<'a> Drop for EventWrapper<'a> {
+impl Drop for EventWrapper<'_> {
     fn drop(&mut self) {
         unsafe {
             let _ = (self.bs.close_event)(self.event);
