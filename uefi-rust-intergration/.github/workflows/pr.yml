@@ -1,0 +1,109 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+    types: [opened, synchronize, reopened]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: -D warnings
+
+jobs:
+  # PR-specific checks
+  pr-checks:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+
+    - name: Check PR title format
+      run: |
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        echo "PR Title: $PR_TITLE"
+        # Allow any reasonable title format
+        if [ -z "$PR_TITLE" ]; then
+          echo "❌ PR title cannot be empty"
+          exit 1
+        fi
+        echo "✅ PR title is valid"
+
+    - name: Check for large files
+      run: |
+        echo "Checking for files larger than 1MB..."
+        large_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | \
+                      xargs -I {} find {} -type f -size +1M 2>/dev/null || true)
+        if [ -n "$large_files" ]; then
+          echo "⚠️ Warning: Large files detected:"
+          echo "$large_files"
+          echo "Consider using Git LFS for large binary files"
+        else
+          echo "✅ No large files detected"
+        fi
+
+    - name: Check for sensitive patterns
+      run: |
+        echo "Checking for potential secrets or sensitive data..."
+        if git diff origin/${{ github.base_ref }}...HEAD | \
+           grep -iE '(password|secret|api_key|token|private_key)\s*=|BEGIN (RSA|PRIVATE)'; then
+          echo "⚠️ Warning: Potential sensitive data detected in diff"
+          echo "Please review the changes carefully"
+        else
+          echo "✅ No obvious sensitive patterns detected"
+        fi
+
+  # Run all main CI checks (reuse main CI workflow)
+  run-ci:
+    name: Run Full CI Suite
+    uses: ./.github/workflows/ci.yml
+
+  # Additional PR-specific quality checks
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@nightly-2025-01-09
+      with:
+        components: rust-src
+
+    - name: Add UEFI target
+      run: rustup target add x86_64-unknown-uefi --toolchain nightly-2025-01-09
+
+    - name: Check for TODO/FIXME comments
+      run: |
+        echo "Scanning for TODO/FIXME comments..."
+        todos=$(git grep -n -E '(TODO|FIXME|XXX|HACK):' -- '*.rs' '*.toml' || true)
+        if [ -n "$todos" ]; then
+          echo "📝 Found TODO/FIXME comments:"
+          echo "$todos"
+        else
+          echo "✅ No TODO/FIXME comments found"
+        fi
+
+    - name: Check documentation coverage
+      run: |
+        echo "Checking for undocumented public items..."
+        cargo +nightly-2025-01-09 doc --lib --no-deps --document-private-items 2>&1 | \
+          tee doc_output.txt || true
+        if grep -q "warning: missing documentation" doc_output.txt; then
+          echo "⚠️ Some items lack documentation (this is OK for PR, but consider adding)"
+        else
+          echo "✅ Documentation looks good"
+        fi
+
+  # PR ready for review gate
+  pr-ready:
+    name: PR Ready for Review
+    runs-on: ubuntu-latest
+    needs: [pr-checks, run-ci, code-quality]
+    steps:
+    - name: All checks passed
+      run: |
+        echo "✅ Pull request passed all automated checks!"
+        echo "Ready for human review."
