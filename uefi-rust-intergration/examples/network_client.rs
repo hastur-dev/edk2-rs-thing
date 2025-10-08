@@ -10,10 +10,10 @@
 
 extern crate alloc;
 
-use uefi_rust::*;
-use uefi_rust::protocols::*;
-use uefi_rust::boot_services::*;
 use alloc::vec::Vec;
+use uefi_rust::boot_services::*;
+use uefi_rust::protocols::*;
+use uefi_rust::*;
 
 #[no_mangle]
 pub extern "C" fn efi_main(image_handle: Handle, system_table: *mut SystemTable) -> Status {
@@ -58,7 +58,9 @@ pub extern "C" fn efi_main(image_handle: Handle, system_table: *mut SystemTable)
             station_address: Ipv4Address { addr: [0, 0, 0, 0] },
             subnet_mask: Ipv4Address { addr: [0, 0, 0, 0] },
             station_port: 0,
-            remote_address: Ipv4Address { addr: [192, 168, 1, 1] },
+            remote_address: Ipv4Address {
+                addr: [192, 168, 1, 1],
+            },
             remote_port: 80,
             active_flag: 1,
         },

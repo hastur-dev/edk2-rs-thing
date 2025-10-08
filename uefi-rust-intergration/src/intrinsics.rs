@@ -6,7 +6,7 @@
 
 /// Memory operations intrinsics
 pub mod mem {
-    /// memcpy implementation
+    // memcpy implementation
     // Note: memcpy is now provided by compiler_builtins
     // #[no_mangle]
     // pub unsafe extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
@@ -17,8 +17,7 @@ pub mod mem {
     //     }
     //     dest
     // }
-
-    /// memmove implementation (handles overlapping memory)
+    // memmove implementation (handles overlapping memory)
     // Note: memmove is now provided by compiler_builtins
     // #[no_mangle]
     // pub unsafe extern "C" fn memmove(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
@@ -39,8 +38,7 @@ pub mod mem {
     //     }
     //     dest
     // }
-
-    /// memset implementation
+    // memset implementation
     // Note: memset is now provided by compiler_builtins
     // #[no_mangle]
     // pub unsafe extern "C" fn memset(s: *mut u8, c: i32, n: usize) -> *mut u8 {
@@ -51,8 +49,7 @@ pub mod mem {
     //     }
     //     s
     // }
-
-    /// memcmp implementation
+    // memcmp implementation
     // Note: memcmp is now provided by compiler_builtins
     // #[no_mangle]
     // pub unsafe extern "C" fn memcmp(s1: *const u8, s2: *const u8, n: usize) -> i32 {
@@ -277,6 +274,7 @@ pub mod stack {
 
 /// Unwind/exception handling stubs (not supported in UEFI)
 pub mod unwind {
+    #[allow(unused_imports)]
     use core::ffi::c_void;
 
     #[repr(C)]
@@ -444,6 +442,7 @@ pub mod aarch64 {
 
 #[cfg(test)]
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]
@@ -451,7 +450,7 @@ mod tests {
         let src = [1u8, 2, 3, 4, 5];
         let mut dst = [0u8; 5];
         unsafe {
-            mem::memcpy(dst.as_mut_ptr(), src.as_ptr(), 5);
+            core::ptr::copy_nonoverlapping(src.as_ptr(), dst.as_mut_ptr(), 5);
         }
         assert_eq!(dst, src);
     }
@@ -460,7 +459,7 @@ mod tests {
     fn test_memset() {
         let mut buf = [0u8; 10];
         unsafe {
-            mem::memset(buf.as_mut_ptr(), 0xAB, 10);
+            core::ptr::write_bytes(buf.as_mut_ptr(), 0xAB, 10);
         }
         assert_eq!(buf, [0xAB; 10]);
     }
@@ -471,17 +470,15 @@ mod tests {
         let b = [1u8, 2, 3, 4, 5];
         let c = [1u8, 2, 3, 4, 6];
 
-        unsafe {
-            assert_eq!(mem::memcmp(a.as_ptr(), b.as_ptr(), 5), 0);
-            assert!(mem::memcmp(a.as_ptr(), c.as_ptr(), 5) < 0);
-        }
+        assert_eq!(a[..5], b[..5]);
+        assert!(a[..5] < c[..5]);
     }
 
     #[test]
     fn test_memmove_forward() {
         let mut buf = [1u8, 2, 3, 4, 5, 0, 0, 0];
         unsafe {
-            mem::memmove(buf.as_mut_ptr().add(5), buf.as_ptr(), 3);
+            core::ptr::copy(buf.as_ptr(), buf.as_mut_ptr().add(5), 3);
         }
         assert_eq!(buf, [1, 2, 3, 4, 5, 1, 2, 3]);
     }
@@ -490,7 +487,7 @@ mod tests {
     fn test_memmove_backward() {
         let mut buf = [0u8, 0, 0, 1, 2, 3, 4, 5];
         unsafe {
-            mem::memmove(buf.as_mut_ptr(), buf.as_ptr().add(3), 5);
+            core::ptr::copy(buf.as_ptr().add(3), buf.as_mut_ptr(), 5);
         }
         assert_eq!(buf, [1, 2, 3, 4, 5, 3, 4, 5]);
     }

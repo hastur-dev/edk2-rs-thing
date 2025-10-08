@@ -3,8 +3,8 @@
 
 #![cfg(test)]
 
-use uefi_rust::protocols::*;
 use uefi_rust::ffi::*;
+use uefi_rust::protocols::*;
 
 // Mock protocol structures for testing
 mod mocks {
@@ -69,9 +69,7 @@ mod mocks {
         EFI_SUCCESS
     }
 
-    unsafe extern "efiapi" fn mock_clear_screen(
-        _this: *mut SimpleTextOutputProtocol,
-    ) -> Status {
+    unsafe extern "efiapi" fn mock_clear_screen(_this: *mut SimpleTextOutputProtocol) -> Status {
         EFI_SUCCESS
     }
 
@@ -363,22 +361,31 @@ fn test_cert_type_guids() {
 fn test_rng_algorithm_guids() {
     use misc::*;
 
-    assert_ne!(RNG_ALGORITHM_SP800_90_HASH_256_GUID, RNG_ALGORITHM_SP800_90_HMAC_256_GUID);
-    assert_ne!(RNG_ALGORITHM_SP800_90_HMAC_256_GUID, RNG_ALGORITHM_SP800_90_CTR_256_GUID);
+    assert_ne!(
+        RNG_ALGORITHM_SP800_90_HASH_256_GUID,
+        RNG_ALGORITHM_SP800_90_HMAC_256_GUID
+    );
+    assert_ne!(
+        RNG_ALGORITHM_SP800_90_HMAC_256_GUID,
+        RNG_ALGORITHM_SP800_90_CTR_256_GUID
+    );
 }
 
 #[test]
 fn test_protocol_guids_unique() {
     // Ensure all major protocol GUIDs are unique
-    assert_ne!(SIMPLE_TEXT_INPUT_PROTOCOL_GUID, SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID);
+    assert_ne!(
+        SIMPLE_TEXT_INPUT_PROTOCOL_GUID,
+        SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID
+    );
     assert_ne!(GRAPHICS_OUTPUT_PROTOCOL_GUID, BLOCK_IO_PROTOCOL_GUID);
     assert_ne!(SIMPLE_FILE_SYSTEM_PROTOCOL_GUID, LOADED_IMAGE_PROTOCOL_GUID);
 }
 
 #[test]
 fn test_service_binding_guids() {
-    use tcp_udp::*;
     use ip::*;
+    use tcp_udp::*;
 
     assert_ne!(TCP4_SERVICE_BINDING_PROTOCOL_GUID, TCP4_PROTOCOL_GUID);
     assert_ne!(UDP4_SERVICE_BINDING_PROTOCOL_GUID, UDP4_PROTOCOL_GUID);

@@ -10,10 +10,10 @@
 
 extern crate alloc;
 
-use uefi_rust::*;
+use alloc::vec::Vec;
 use uefi_rust::protocols::*;
 use uefi_rust::tables::*;
-use alloc::vec::Vec;
+use uefi_rust::*;
 
 #[no_mangle]
 pub extern "C" fn efi_main(image_handle: Handle, system_table: *mut SystemTable) -> Status {
@@ -50,9 +50,8 @@ pub extern "C" fn efi_main(image_handle: Handle, system_table: *mut SystemTable)
     print_string(con_out, "-----------\r\n");
 
     let config_table_count = st.number_of_table_entries;
-    let config_table = unsafe {
-        core::slice::from_raw_parts(st.configuration_table, config_table_count)
-    };
+    let config_table =
+        unsafe { core::slice::from_raw_parts(st.configuration_table, config_table_count) };
 
     let mut found_acpi = false;
     for entry in config_table {

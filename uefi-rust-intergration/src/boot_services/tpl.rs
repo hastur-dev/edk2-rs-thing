@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! Task Priority Level (TPL) Management Utilities
 
-use crate::ffi::*;
 use crate::boot_services::BootServices;
+use crate::ffi::*;
 
 /// Task Priority Levels
 pub const TPL_APPLICATION: Tpl = 4;

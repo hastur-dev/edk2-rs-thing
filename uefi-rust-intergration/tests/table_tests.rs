@@ -3,8 +3,8 @@
 
 #![cfg(test)]
 
-use uefi_rust::tables::*;
 use uefi_rust::ffi::*;
+use uefi_rust::tables::*;
 
 #[test]
 fn test_acpi_rsdp_signature() {

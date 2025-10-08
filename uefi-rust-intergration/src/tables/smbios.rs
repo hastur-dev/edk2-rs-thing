@@ -23,7 +23,7 @@ pub const SMBIOS3_TABLE_GUID: Guid = Guid::new(
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct SmbiosEntryPoint {
-    pub anchor_string: [u8; 4],         // "_SM_"
+    pub anchor_string: [u8; 4], // "_SM_"
     pub checksum: u8,
     pub length: u8,
     pub major_version: u8,
@@ -31,7 +31,7 @@ pub struct SmbiosEntryPoint {
     pub max_structure_size: u16,
     pub entry_point_revision: u8,
     pub formatted_area: [u8; 5],
-    pub intermediate_anchor: [u8; 5],   // "_DMI_"
+    pub intermediate_anchor: [u8; 5], // "_DMI_"
     pub intermediate_checksum: u8,
     pub structure_table_length: u16,
     pub structure_table_address: u32,
@@ -43,7 +43,7 @@ pub struct SmbiosEntryPoint {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct Smbios3EntryPoint {
-    pub anchor_string: [u8; 5],         // "_SM3_"
+    pub anchor_string: [u8; 5], // "_SM3_"
     pub checksum: u8,
     pub length: u8,
     pub major_version: u8,
@@ -69,10 +69,10 @@ pub struct SmbiosHeader {
 #[derive(Debug, Copy, Clone)]
 pub struct BiosInformation {
     pub header: SmbiosHeader,
-    pub vendor: u8,                     // String number
-    pub bios_version: u8,               // String number
+    pub vendor: u8,       // String number
+    pub bios_version: u8, // String number
     pub bios_starting_segment: u16,
-    pub bios_release_date: u8,          // String number
+    pub bios_release_date: u8, // String number
     pub bios_rom_size: u8,
     pub bios_characteristics: u64,
     // Additional fields may follow depending on version
@@ -83,14 +83,14 @@ pub struct BiosInformation {
 #[derive(Debug, Copy, Clone)]
 pub struct SystemInformation {
     pub header: SmbiosHeader,
-    pub manufacturer: u8,               // String number
-    pub product_name: u8,               // String number
-    pub version: u8,                    // String number
-    pub serial_number: u8,              // String number
+    pub manufacturer: u8,  // String number
+    pub product_name: u8,  // String number
+    pub version: u8,       // String number
+    pub serial_number: u8, // String number
     pub uuid: [u8; 16],
     pub wake_up_type: u8,
-    pub sku_number: u8,                 // String number
-    pub family: u8,                     // String number
+    pub sku_number: u8, // String number
+    pub family: u8,     // String number
 }
 
 /// SMBIOS Type 2: Baseboard Information
@@ -98,13 +98,13 @@ pub struct SystemInformation {
 #[derive(Debug, Copy, Clone)]
 pub struct BaseboardInformation {
     pub header: SmbiosHeader,
-    pub manufacturer: u8,               // String number
-    pub product: u8,                    // String number
-    pub version: u8,                    // String number
-    pub serial_number: u8,              // String number
-    pub asset_tag: u8,                  // String number
+    pub manufacturer: u8,  // String number
+    pub product: u8,       // String number
+    pub version: u8,       // String number
+    pub serial_number: u8, // String number
+    pub asset_tag: u8,     // String number
     pub feature_flags: u8,
-    pub location_in_chassis: u8,        // String number
+    pub location_in_chassis: u8, // String number
     pub chassis_handle: u16,
     pub board_type: u8,
     pub number_of_contained_handles: u8,
@@ -115,12 +115,12 @@ pub struct BaseboardInformation {
 #[derive(Debug, Copy, Clone)]
 pub struct ProcessorInformation {
     pub header: SmbiosHeader,
-    pub socket_designation: u8,         // String number
+    pub socket_designation: u8, // String number
     pub processor_type: u8,
     pub processor_family: u8,
-    pub processor_manufacturer: u8,     // String number
+    pub processor_manufacturer: u8, // String number
     pub processor_id: u64,
-    pub processor_version: u8,          // String number
+    pub processor_version: u8, // String number
     pub voltage: u8,
     pub external_clock: u16,
     pub max_speed: u16,
@@ -142,8 +142,8 @@ pub struct MemoryDevice {
     pub size: u16,
     pub form_factor: u8,
     pub device_set: u8,
-    pub device_locator: u8,             // String number
-    pub bank_locator: u8,               // String number
+    pub device_locator: u8, // String number
+    pub bank_locator: u8,   // String number
     pub memory_type: u8,
     pub type_detail: u16,
     // Additional fields may follow
@@ -167,10 +167,7 @@ impl SmbiosEntryPoint {
     /// Verify checksum
     pub fn verify_checksum(&self) -> bool {
         let bytes = unsafe {
-            core::slice::from_raw_parts(
-                self as *const _ as *const u8,
-                self.length as usize,
-            )
+            core::slice::from_raw_parts(self as *const _ as *const u8, self.length as usize)
         };
 
         let sum: u8 = bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
@@ -192,10 +189,7 @@ impl Smbios3EntryPoint {
     /// Verify checksum
     pub fn verify_checksum(&self) -> bool {
         let bytes = unsafe {
-            core::slice::from_raw_parts(
-                self as *const _ as *const u8,
-                self.length as usize,
-            )
+            core::slice::from_raw_parts(self as *const _ as *const u8, self.length as usize)
         };
 
         let sum: u8 = bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));

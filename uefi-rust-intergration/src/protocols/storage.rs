@@ -310,10 +310,8 @@ pub struct DiskIo2Protocol {
         buffer_size: Uintn,
         buffer: *const core::ffi::c_void,
     ) -> Status,
-    pub flush_disk_ex: unsafe extern "efiapi" fn(
-        this: *mut DiskIo2Protocol,
-        token: *mut DiskIo2Token,
-    ) -> Status,
+    pub flush_disk_ex:
+        unsafe extern "efiapi" fn(this: *mut DiskIo2Protocol, token: *mut DiskIo2Token) -> Status,
 }
 
 /// Partition Type
@@ -377,12 +375,7 @@ pub struct PartitionInfoProtocol {
 
 impl DiskIoProtocol {
     /// Read from disk at byte offset
-    pub unsafe fn read_disk(
-        &mut self,
-        media_id: u32,
-        offset: u64,
-        buffer: &mut [u8],
-    ) -> Status {
+    pub unsafe fn read_disk(&mut self, media_id: u32, offset: u64, buffer: &mut [u8]) -> Status {
         (self.read_disk)(
             self,
             media_id,
@@ -393,12 +386,7 @@ impl DiskIoProtocol {
     }
 
     /// Write to disk at byte offset
-    pub unsafe fn write_disk(
-        &mut self,
-        media_id: u32,
-        offset: u64,
-        buffer: &[u8],
-    ) -> Status {
+    pub unsafe fn write_disk(&mut self, media_id: u32, offset: u64, buffer: &[u8]) -> Status {
         (self.write_disk)(
             self,
             media_id,
@@ -624,7 +612,10 @@ impl<'a> Iterator for ScsiDeviceIterator<'a> {
             self.first = false;
         }
 
-        let status = unsafe { self.protocol.get_next_device(&mut self.target, &mut self.lun) };
+        let status = unsafe {
+            self.protocol
+                .get_next_device(&mut self.target, &mut self.lun)
+        };
 
         if status == EFI_SUCCESS {
             Some((self.target, self.lun))
@@ -715,7 +706,11 @@ impl<'a> SafeNvmePassThru<'a> {
     }
 
     /// Send NVMe Identify Namespace command
-    pub fn identify_namespace(&mut self, namespace_id: u32, buffer: &mut [u8; 4096]) -> Result<(), Status> {
+    pub fn identify_namespace(
+        &mut self,
+        namespace_id: u32,
+        buffer: &mut [u8; 4096],
+    ) -> Result<(), Status> {
         let mut cmd = NvmeCommand {
             cdw0: 0x06, // Identify command
             flags: 0,
@@ -957,7 +952,9 @@ impl<'a> SafePartitionInfo<'a> {
     pub fn partition_name(&self) -> Option<&[Char16]> {
         self.gpt_info().map(|gpt| {
             // Find null terminator
-            let len = gpt.partition_name.iter()
+            let len = gpt
+                .partition_name
+                .iter()
                 .position(|&c| c == 0)
                 .unwrap_or(gpt.partition_name.len());
             &gpt.partition_name[..len]
@@ -975,17 +972,14 @@ pub mod scsi_builder {
     use super::*;
 
     /// Build a SCSI INQUIRY command packet
-    pub fn build_inquiry(
-        buffer: &mut [u8],
-        timeout: u64,
-    ) -> (ScsiPassThruRequestPacket, [u8; 6]) {
+    pub fn build_inquiry(buffer: &mut [u8], timeout: u64) -> (ScsiPassThruRequestPacket, [u8; 6]) {
         let cdb = [
             scsi_commands::SCSI_INQUIRY, // Opcode
-            0x00,                         // EVPD=0
-            0x00,                         // Page code
-            0x00,                         // Reserved
-            buffer.len() as u8,           // Allocation length
-            0x00,                         // Control
+            0x00,                        // EVPD=0
+            0x00,                        // Page code
+            0x00,                        // Reserved
+            buffer.len() as u8,          // Allocation length
+            0x00,                        // Control
         ];
 
         let packet = ScsiPassThruRequestPacket {
@@ -1015,16 +1009,16 @@ pub mod scsi_builder {
         let blocks = (buffer.len() / 512) as u16;
 
         let cdb = [
-            scsi_commands::SCSI_READ_10,  // Opcode
-            0x00,                          // Flags
-            (lba >> 24) as u8,             // LBA
+            scsi_commands::SCSI_READ_10, // Opcode
+            0x00,                        // Flags
+            (lba >> 24) as u8,           // LBA
             (lba >> 16) as u8,
             (lba >> 8) as u8,
             lba as u8,
-            0x00,                          // Group number
-            (blocks >> 8) as u8,           // Transfer length
+            0x00,                // Group number
+            (blocks >> 8) as u8, // Transfer length
             blocks as u8,
-            0x00,                          // Control
+            0x00, // Control
         ];
 
         let packet = ScsiPassThruRequestPacket {
@@ -1055,15 +1049,15 @@ pub mod scsi_builder {
 
         let cdb = [
             scsi_commands::SCSI_WRITE_10, // Opcode
-            0x00,                          // Flags
-            (lba >> 24) as u8,             // LBA
+            0x00,                         // Flags
+            (lba >> 24) as u8,            // LBA
             (lba >> 16) as u8,
             (lba >> 8) as u8,
             lba as u8,
-            0x00,                          // Group number
-            (blocks >> 8) as u8,           // Transfer length
+            0x00,                // Group number
+            (blocks >> 8) as u8, // Transfer length
             blocks as u8,
-            0x00,                          // Control
+            0x00, // Control
         ];
 
         let packet = ScsiPassThruRequestPacket {
@@ -1123,8 +1117,10 @@ mod tests {
         assert_eq!(packet.data_direction, SCSI_DATA_IN);
 
         // Check LBA encoding
-        let lba = ((cdb[2] as u32) << 24) | ((cdb[3] as u32) << 16)
-                | ((cdb[4] as u32) << 8) | (cdb[5] as u32);
+        let lba = ((cdb[2] as u32) << 24)
+            | ((cdb[3] as u32) << 16)
+            | ((cdb[4] as u32) << 8)
+            | (cdb[5] as u32);
         assert_eq!(lba, 100);
     }
 }

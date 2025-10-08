@@ -24,6 +24,12 @@ pub struct Logger {
     level: LogLevel,
 }
 
+impl Default for Logger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Logger {
     /// Create a new logger
     pub const fn new() -> Self {
@@ -55,7 +61,7 @@ impl Logger {
 
     /// Get the global logger
     fn get() -> Option<&'static mut Logger> {
-        unsafe { LOGGER.as_mut() }
+        unsafe { (&raw mut LOGGER).as_mut().and_then(|x| x.as_mut()) }
     }
 
     /// Log a message

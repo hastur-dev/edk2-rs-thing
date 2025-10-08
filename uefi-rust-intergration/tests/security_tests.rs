@@ -3,8 +3,8 @@
 
 #![cfg(test)]
 
-use uefi_rust::protocols::security::*;
 use uefi_rust::ffi::*;
+use uefi_rust::protocols::security::*;
 
 // ============================================================================
 // Hash Algorithm GUID Tests
@@ -147,10 +147,7 @@ fn test_tpm2_version_size() {
 
 #[test]
 fn test_tpm2_version_fields() {
-    let version = Tpm2Version {
-        major: 1,
-        minor: 2,
-    };
+    let version = Tpm2Version { major: 1, minor: 2 };
 
     assert_eq!(version.major, 1);
     assert_eq!(version.minor, 2);
@@ -254,8 +251,8 @@ fn test_tpm2_response_parsing() {
     // Simulate TPM2 response
     let mut response = [0u8; 10];
     response[0..2].copy_from_slice(&0x8001u16.to_be_bytes()); // tag
-    response[2..6].copy_from_slice(&10u32.to_be_bytes());     // size
-    response[6..10].copy_from_slice(&0u32.to_be_bytes());     // response code (success)
+    response[2..6].copy_from_slice(&10u32.to_be_bytes()); // size
+    response[6..10].copy_from_slice(&0u32.to_be_bytes()); // response code (success)
 
     // Parse response
     let tag = u16::from_be_bytes([response[0], response[1]]);
@@ -289,7 +286,10 @@ fn test_secure_boot_db_variable_content() {
 #[test]
 fn test_secure_boot_dbx_variable_content() {
     // "dbx\0" in UCS-2
-    assert_eq!(IMAGE_SECURITY_DATABASE1_VARIABLE, &[0x0064, 0x0062, 0x0078, 0x0000]);
+    assert_eq!(
+        IMAGE_SECURITY_DATABASE1_VARIABLE,
+        &[0x0064, 0x0062, 0x0078, 0x0000]
+    );
 }
 
 #[test]
@@ -310,8 +310,14 @@ fn test_secure_boot_kek_variable_content() {
 
 #[test]
 fn test_security_structure_alignments() {
-    assert_eq!(core::mem::align_of::<SignatureData>(), core::mem::align_of::<Guid>());
-    assert_eq!(core::mem::align_of::<SignatureList>(), core::mem::align_of::<Guid>());
+    assert_eq!(
+        core::mem::align_of::<SignatureData>(),
+        core::mem::align_of::<Guid>()
+    );
+    assert_eq!(
+        core::mem::align_of::<SignatureList>(),
+        core::mem::align_of::<Guid>()
+    );
     assert_eq!(core::mem::align_of::<HashOutput>(), 1); // Union of arrays
 }
 
@@ -378,19 +384,17 @@ fn test_signature_list_with_header() {
         signature_type: CERT_X509_GUID,
         signature_list_size: 2048,
         signature_header_size: 64, // Optional header
-        signature_size: 256,        // Variable X.509 cert
+        signature_size: 256,       // Variable X.509 cert
     };
 
     let list_header_size = core::mem::size_of::<SignatureList>();
     let sig_header_size = sig_list.signature_header_size as usize;
-    let data_size = sig_list.signature_list_size as usize
-                    - list_header_size
-                    - sig_header_size;
+    let data_size = sig_list.signature_list_size as usize - list_header_size - sig_header_size;
     let sig_count = data_size / sig_list.signature_size as usize;
 
     assert_eq!(list_header_size, 28);
     assert_eq!(data_size, 1956); // 2048 - 28 - 64
-    assert_eq!(sig_count, 7);    // 1956 / 256
+    assert_eq!(sig_count, 7); // 1956 / 256
 }
 
 // ============================================================================
@@ -418,7 +422,10 @@ fn test_minimal_signature_list() {
         signature_size: 0,
     };
 
-    assert_eq!(sig_list.signature_list_size, core::mem::size_of::<SignatureList>() as u32);
+    assert_eq!(
+        sig_list.signature_list_size,
+        core::mem::size_of::<SignatureList>() as u32
+    );
 }
 
 // ============================================================================

@@ -150,21 +150,12 @@ pub struct HttpProtocol {
         this: *mut HttpProtocol,
         config_data: *const HttpConfigData,
     ) -> Status,
-    pub request: unsafe extern "efiapi" fn(
-        this: *mut HttpProtocol,
-        token: *mut HttpToken,
-    ) -> Status,
-    pub cancel: unsafe extern "efiapi" fn(
-        this: *mut HttpProtocol,
-        token: *mut HttpToken,
-    ) -> Status,
-    pub response: unsafe extern "efiapi" fn(
-        this: *mut HttpProtocol,
-        token: *mut HttpToken,
-    ) -> Status,
-    pub poll: unsafe extern "efiapi" fn(
-        this: *mut HttpProtocol,
-    ) -> Status,
+    pub request:
+        unsafe extern "efiapi" fn(this: *mut HttpProtocol, token: *mut HttpToken) -> Status,
+    pub cancel: unsafe extern "efiapi" fn(this: *mut HttpProtocol, token: *mut HttpToken) -> Status,
+    pub response:
+        unsafe extern "efiapi" fn(this: *mut HttpProtocol, token: *mut HttpToken) -> Status,
+    pub poll: unsafe extern "efiapi" fn(this: *mut HttpProtocol) -> Status,
 }
 
 impl HttpProtocol {

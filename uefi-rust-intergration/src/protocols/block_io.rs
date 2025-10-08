@@ -59,9 +59,7 @@ pub struct BlockIoProtocol {
         buffer_size: Uintn,
         buffer: *const core::ffi::c_void,
     ) -> Status,
-    pub flush_blocks: unsafe extern "efiapi" fn(
-        this: *mut BlockIoProtocol,
-    ) -> Status,
+    pub flush_blocks: unsafe extern "efiapi" fn(this: *mut BlockIoProtocol) -> Status,
 }
 
 impl BlockIoProtocol {

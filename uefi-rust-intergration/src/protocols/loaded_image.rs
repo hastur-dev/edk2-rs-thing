@@ -2,8 +2,8 @@
 //! UEFI Loaded Image Protocol
 
 use crate::ffi::*;
-use crate::system_table::SystemTable;
 use crate::protocols::DevicePathProtocol;
+use crate::system_table::SystemTable;
 
 /// EFI_LOADED_IMAGE_PROTOCOL_GUID
 pub const LOADED_IMAGE_PROTOCOL_GUID: Guid = Guid::new(

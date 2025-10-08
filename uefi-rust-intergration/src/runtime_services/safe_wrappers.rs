@@ -2,7 +2,7 @@
 //! Safe wrappers around Runtime Services
 
 use crate::ffi::*;
-use crate::runtime_services::{RuntimeServices, Time, ResetType};
+use crate::runtime_services::{ResetType, RuntimeServices, Time};
 
 /// Result type for UEFI operations
 pub type Result<T> = core::result::Result<T, Status>;
@@ -34,9 +34,7 @@ impl<'a> RuntimeServicesWrapper<'a> {
             pad2: 0,
         };
 
-        let status = unsafe {
-            (self.rs.get_time)(&mut time, core::ptr::null_mut())
-        };
+        let status = unsafe { (self.rs.get_time)(&mut time, core::ptr::null_mut()) };
 
         if status == EFI_SUCCESS {
             Ok(time)

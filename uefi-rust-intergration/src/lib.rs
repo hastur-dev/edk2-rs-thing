@@ -7,28 +7,41 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(not(feature = "std"), feature(alloc_error_handler))]
 #![cfg_attr(not(feature = "std"), feature(lang_items))]
+#![allow(clippy::missing_safety_doc)]
+#![allow(improper_ctypes_definitions)]
+#![allow(clippy::mut_from_ref)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::assertions_on_constants)]
+#![allow(clippy::empty_loop)]
+#![cfg_attr(test, allow(unused_imports))]
+#![cfg_attr(test, allow(unused_variables))]
+#![cfg_attr(test, allow(clippy::useless_transmute))]
+#![cfg_attr(test, allow(clippy::field_reassign_with_default))]
+#![cfg_attr(test, allow(clippy::unnecessary_unwrap))]
+#![cfg_attr(test, allow(clippy::needless_parens))]
 
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 
-pub mod ffi;
 pub mod allocator;
 pub mod boot_services;
-pub mod runtime_services;
-pub mod protocols;
-pub mod system_table;
-pub mod string;
+pub mod debug;
+pub mod ffi;
+pub mod graphics;
 pub mod guid;
+pub mod intrinsics;
 pub mod logger;
 pub mod panic_handler;
+pub mod protocols;
+pub mod runtime_services;
+pub mod string;
+pub mod system_table;
 pub mod tables;
-pub mod debug;
-pub mod graphics;
-pub mod intrinsics;
 
 pub use ffi::*;
 pub use system_table::SystemTable;
 
+#[cfg(not(feature = "std"))]
 use core::panic::PanicInfo;
 
 /// Panic handler for no_std environment

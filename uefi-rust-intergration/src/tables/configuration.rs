@@ -41,7 +41,9 @@ impl<'a> ConfigurationTableIter<'a> {
     /// Create a new configuration table iterator
     pub fn new(system_table: &'a SystemTable) -> Self {
         let tables = unsafe {
-            if system_table.configuration_table.is_null() || system_table.number_of_table_entries == 0 {
+            if system_table.configuration_table.is_null()
+                || system_table.number_of_table_entries == 0
+            {
                 &[]
             } else {
                 core::slice::from_raw_parts(

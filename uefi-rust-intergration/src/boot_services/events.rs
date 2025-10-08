@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! UEFI Event and Timer Services
 
-use crate::ffi::*;
 use crate::boot_services::BootServices;
+use crate::ffi::*;
 
 // Event types
 pub const EVT_TIMER: u32 = 0x80000000;
@@ -40,7 +40,8 @@ impl<'a> EventWrapper<'a> {
         notify_context: *mut core::ffi::c_void,
     ) -> Result<Self, Status> {
         let mut event = core::ptr::null_mut();
-        let notify_fn = notify_function.map_or(core::ptr::null_mut(), |f| f as *mut core::ffi::c_void);
+        let notify_fn =
+            notify_function.map_or(core::ptr::null_mut(), |f| f as *mut core::ffi::c_void);
 
         let status = (bs.create_event)(
             event_type,
@@ -67,7 +68,8 @@ impl<'a> EventWrapper<'a> {
         event_group: Option<&Guid>,
     ) -> Result<Self, Status> {
         let mut event = core::ptr::null_mut();
-        let notify_fn = notify_function.map_or(core::ptr::null_mut(), |f| f as *mut core::ffi::c_void);
+        let notify_fn =
+            notify_function.map_or(core::ptr::null_mut(), |f| f as *mut core::ffi::c_void);
         let group_ptr = event_group.map_or(core::ptr::null(), |g| g as *const _);
 
         let status = (bs.create_event_ex)(
@@ -135,13 +137,7 @@ pub struct Timer<'a> {
 impl<'a> Timer<'a> {
     /// Create a new timer
     pub unsafe fn create(bs: &'a BootServices, tpl: Tpl) -> Result<Self, Status> {
-        let event = EventWrapper::create(
-            bs,
-            EVT_TIMER,
-            tpl,
-            None,
-            core::ptr::null_mut(),
-        )?;
+        let event = EventWrapper::create(bs, EVT_TIMER, tpl, None, core::ptr::null_mut())?;
 
         Ok(Timer { event })
     }
@@ -153,7 +149,8 @@ impl<'a> Timer<'a> {
 
     /// Set timer to fire periodically (in 100ns units)
     pub unsafe fn set_periodic(&self, period_100ns: u64) -> Status {
-        self.event.set_timer(TimerDelay::TimerPeriodic, period_100ns)
+        self.event
+            .set_timer(TimerDelay::TimerPeriodic, period_100ns)
     }
 
     /// Cancel the timer

@@ -4,12 +4,12 @@
 use crate::ffi::*;
 
 pub mod safe_wrappers;
-pub mod variables;
 pub mod time;
+pub mod variables;
 
 pub use safe_wrappers::RuntimeServicesWrapper;
+pub use time::{Time, TimeCapabilities, TimeService};
 pub use variables::*;
-pub use time::{TimeService, Time, TimeCapabilities};
 
 /// EFI_RESET_TYPE
 #[repr(u32)]
@@ -27,9 +27,14 @@ pub struct RuntimeServices {
     pub hdr: TableHeader,
 
     // Time Services
-    pub get_time: unsafe extern "efiapi" fn(time: *mut Time, capabilities: *mut TimeCapabilities) -> Status,
+    pub get_time:
+        unsafe extern "efiapi" fn(time: *mut Time, capabilities: *mut TimeCapabilities) -> Status,
     pub set_time: unsafe extern "efiapi" fn(time: *const Time) -> Status,
-    pub get_wakeup_time: unsafe extern "efiapi" fn(enabled: *mut Boolean, pending: *mut Boolean, time: *mut Time) -> Status,
+    pub get_wakeup_time: unsafe extern "efiapi" fn(
+        enabled: *mut Boolean,
+        pending: *mut Boolean,
+        time: *mut Time,
+    ) -> Status,
     pub set_wakeup_time: unsafe extern "efiapi" fn(enable: Boolean, time: *const Time) -> Status,
 
     // Virtual Memory Services
@@ -39,7 +44,10 @@ pub struct RuntimeServices {
         descriptor_version: Uint32,
         virtual_map: *mut MemoryDescriptor,
     ) -> Status,
-    pub convert_pointer: unsafe extern "efiapi" fn(debug_disposition: Uintn, address: *mut *mut core::ffi::c_void) -> Status,
+    pub convert_pointer: unsafe extern "efiapi" fn(
+        debug_disposition: Uintn,
+        address: *mut *mut core::ffi::c_void,
+    ) -> Status,
 
     // Variable Services
     pub get_variable: unsafe extern "efiapi" fn(

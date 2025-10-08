@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! UEFI Global Allocator implementation
 
+use crate::boot_services::BootServices;
+use crate::ffi::*;
 use core::alloc::{GlobalAlloc, Layout};
 use core::ptr::null_mut;
-use crate::ffi::*;
-use crate::boot_services::BootServices;
 
 /// Global reference to Boot Services (set during initialization)
 static mut BOOT_SERVICES: Option<&'static BootServices> = None;
@@ -31,11 +31,7 @@ unsafe impl GlobalAlloc for UefiAllocator {
             // For larger alignments, we need to allocate extra space
             if align <= 8 {
                 // Standard allocation
-                let status = (bs.allocate_pool)(
-                    MemoryType::LoaderData,
-                    size,
-                    &mut buffer,
-                );
+                let status = (bs.allocate_pool)(MemoryType::LoaderData, size, &mut buffer);
 
                 if status == EFI_SUCCESS && !buffer.is_null() {
                     buffer as *mut u8
@@ -46,11 +42,7 @@ unsafe impl GlobalAlloc for UefiAllocator {
                 // Over-allocate to handle alignment
                 let total_size = size + align + core::mem::size_of::<usize>();
 
-                let status = (bs.allocate_pool)(
-                    MemoryType::LoaderData,
-                    total_size,
-                    &mut buffer,
-                );
+                let status = (bs.allocate_pool)(MemoryType::LoaderData, total_size, &mut buffer);
 
                 if status != EFI_SUCCESS || buffer.is_null() {
                     return null_mut();

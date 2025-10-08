@@ -6,12 +6,12 @@
 
 #![cfg(test)]
 
+use std::collections::HashMap;
+use std::sync::Mutex;
+use uefi_rust::boot_services::*;
 use uefi_rust::ffi::*;
 use uefi_rust::protocols::*;
-use uefi_rust::boot_services::*;
 use uefi_rust::runtime_services::*;
-use std::sync::Mutex;
-use std::collections::HashMap;
 
 /// Mock UEFI environment
 pub struct MockUefiEnvironment {
@@ -30,7 +30,8 @@ impl MockUefiEnvironment {
     }
 
     pub fn install_protocol<T>(&mut self, guid: Guid, protocol: *mut T) {
-        self.protocols.insert(guid, protocol as *mut core::ffi::c_void);
+        self.protocols
+            .insert(guid, protocol as *mut core::ffi::c_void);
     }
 
     pub fn locate_protocol<T>(&self, guid: &Guid) -> Option<*mut T> {

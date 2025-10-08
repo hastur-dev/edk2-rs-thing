@@ -5,9 +5,9 @@
 
 mod mock_uefi;
 
-use uefi_rust_intergration::ffi::*;
-use uefi_rust_intergration::boot_services::*;
 use mock_uefi::*;
+use uefi_rust_intergration::boot_services::*;
+use uefi_rust_intergration::ffi::*;
 
 #[test]
 fn test_boot_services_signature() {
@@ -20,11 +20,7 @@ fn test_allocate_pages_success() {
     let bs = create_mock_boot_services();
     let wrapper = BootServicesWrapper::new(&bs);
 
-    let result = wrapper.allocate_pages(
-        AllocateType::AllocateAnyPages,
-        MemoryType::LoaderData,
-        1,
-    );
+    let result = wrapper.allocate_pages(AllocateType::AllocateAnyPages, MemoryType::LoaderData, 1);
 
     assert!(result.is_ok());
     let addr = result.unwrap();
@@ -53,11 +49,9 @@ fn test_free_pages_success() {
     let bs = create_mock_boot_services();
     let wrapper = BootServicesWrapper::new(&bs);
 
-    let addr = wrapper.allocate_pages(
-        AllocateType::AllocateAnyPages,
-        MemoryType::LoaderData,
-        1,
-    ).unwrap();
+    let addr = wrapper
+        .allocate_pages(AllocateType::AllocateAnyPages, MemoryType::LoaderData, 1)
+        .unwrap();
 
     let result = wrapper.free_pages(addr, 1);
     assert!(result.is_ok());
@@ -86,9 +80,7 @@ fn test_allocate_pool_zero_size() {
     let bs = create_mock_boot_services();
 
     let mut buffer: *mut core::ffi::c_void = core::ptr::null_mut();
-    let status = unsafe {
-        (bs.allocate_pool)(MemoryType::LoaderData, 0, &mut buffer)
-    };
+    let status = unsafe { (bs.allocate_pool)(MemoryType::LoaderData, 0, &mut buffer) };
 
     assert_eq!(status, EFI_INVALID_PARAMETER);
     clear_mock_pool();
@@ -111,9 +103,7 @@ fn test_free_pool_success() {
 fn test_free_pool_null_pointer() {
     let bs = create_mock_boot_services();
 
-    let status = unsafe {
-        (bs.free_pool)(core::ptr::null_mut())
-    };
+    let status = unsafe { (bs.free_pool)(core::ptr::null_mut()) };
 
     assert_eq!(status, EFI_INVALID_PARAMETER);
 }

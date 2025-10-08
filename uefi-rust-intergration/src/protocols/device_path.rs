@@ -50,8 +50,8 @@ pub const MSG_SCSI_DP: u8 = 0x02;
 pub const MSG_FIBRECHANNEL_DP: u8 = 0x03;
 pub const MSG_USB_DP: u8 = 0x05;
 pub const MSG_MAC_ADDR_DP: u8 = 0x0b;
-pub const MSG_IPv4_DP: u8 = 0x0c;
-pub const MSG_IPv6_DP: u8 = 0x0d;
+pub const MSG_IPV4_DP: u8 = 0x0c;
+pub const MSG_IPV6_DP: u8 = 0x0d;
 pub const MSG_UART_DP: u8 = 0x0e;
 pub const MSG_VENDOR_DP: u8 = 0x0a;
 pub const MSG_SATA_DP: u8 = 0x12;
@@ -78,8 +78,7 @@ impl DevicePathProtocol {
 
     /// Check if this is the end of the entire device path
     pub fn is_end_entire(&self) -> bool {
-        self.path_type == END_DEVICE_PATH_TYPE
-            && self.sub_type == END_ENTIRE_DEVICE_PATH_SUBTYPE
+        self.path_type == END_DEVICE_PATH_TYPE && self.sub_type == END_ENTIRE_DEVICE_PATH_SUBTYPE
     }
 
     /// Get next device path node

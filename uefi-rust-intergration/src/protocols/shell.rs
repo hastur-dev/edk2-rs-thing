@@ -113,37 +113,28 @@ pub struct ShellProtocol {
         value: *const Char16,
         volatile: Boolean,
     ) -> Status,
-    pub get_alias: unsafe extern "efiapi" fn(
-        alias: *const Char16,
-        volatile: *mut Boolean,
-    ) -> *const Char16,
+    pub get_alias:
+        unsafe extern "efiapi" fn(alias: *const Char16, volatile: *mut Boolean) -> *const Char16,
     pub set_alias: unsafe extern "efiapi" fn(
         command: *const Char16,
         alias: *const Char16,
         replace: Boolean,
         volatile: Boolean,
     ) -> Status,
-    pub get_help_text: unsafe extern "efiapi" fn(
-        command: *const Char16,
-        sections: *const Char16,
-    ) -> *mut Char16,
+    pub get_help_text:
+        unsafe extern "efiapi" fn(command: *const Char16, sections: *const Char16) -> *mut Char16,
     pub get_device_path_from_map: unsafe extern "efiapi" fn(mapping: *const Char16) -> DevicePath,
-    pub get_map_from_device_path: unsafe extern "efiapi" fn(
-        device_path: *mut DevicePath,
-    ) -> *const Char16,
+    pub get_map_from_device_path:
+        unsafe extern "efiapi" fn(device_path: *mut DevicePath) -> *const Char16,
     pub get_device_path_from_file_path:
         unsafe extern "efiapi" fn(path: *const Char16) -> DevicePath,
     pub get_file_path_from_device_path:
         unsafe extern "efiapi" fn(device_path: DevicePath) -> *const Char16,
-    pub set_map: unsafe extern "efiapi" fn(
-        device_path: DevicePath,
-        mapping: *const Char16,
-    ) -> Status,
+    pub set_map:
+        unsafe extern "efiapi" fn(device_path: DevicePath, mapping: *const Char16) -> Status,
     pub get_cur_dir: unsafe extern "efiapi" fn(file_system_mapping: *const Char16) -> *const Char16,
-    pub set_cur_dir: unsafe extern "efiapi" fn(
-        file_system: *const Char16,
-        dir: *const Char16,
-    ) -> Status,
+    pub set_cur_dir:
+        unsafe extern "efiapi" fn(file_system: *const Char16, dir: *const Char16) -> Status,
     pub open_file_list: unsafe extern "efiapi" fn(
         path: *const Char16,
         open_mode: Uint64,
@@ -164,10 +155,8 @@ pub struct ShellProtocol {
         best_device_name: *mut *mut Char16,
     ) -> Status,
     pub get_file_info: unsafe extern "efiapi" fn(file_handle: ShellFileHandle) -> *mut FileInfo,
-    pub set_file_info: unsafe extern "efiapi" fn(
-        file_handle: ShellFileHandle,
-        file_info: *mut FileInfo,
-    ) -> Status,
+    pub set_file_info:
+        unsafe extern "efiapi" fn(file_handle: ShellFileHandle, file_info: *mut FileInfo) -> Status,
     pub open_file_by_name: unsafe extern "efiapi" fn(
         file_name: *const Char16,
         file_handle: *mut ShellFileHandle,
@@ -191,14 +180,10 @@ pub struct ShellProtocol {
     ) -> Status,
     pub delete_file: unsafe extern "efiapi" fn(file_handle: ShellFileHandle) -> Status,
     pub delete_file_by_name: unsafe extern "efiapi" fn(file_name: *const Char16) -> Status,
-    pub get_file_position: unsafe extern "efiapi" fn(
-        file_handle: ShellFileHandle,
-        position: *mut Uint64,
-    ) -> Status,
-    pub set_file_position: unsafe extern "efiapi" fn(
-        file_handle: ShellFileHandle,
-        position: Uint64,
-    ) -> Status,
+    pub get_file_position:
+        unsafe extern "efiapi" fn(file_handle: ShellFileHandle, position: *mut Uint64) -> Status,
+    pub set_file_position:
+        unsafe extern "efiapi" fn(file_handle: ShellFileHandle, position: Uint64) -> Status,
     pub flush_file: unsafe extern "efiapi" fn(file_handle: ShellFileHandle) -> Status,
     pub find_files: unsafe extern "efiapi" fn(
         file_pattern: *const Char16,
@@ -208,10 +193,8 @@ pub struct ShellProtocol {
         file_dir_handle: ShellFileHandle,
         file_list: *mut *mut ShellFileInfo,
     ) -> Status,
-    pub get_file_size: unsafe extern "efiapi" fn(
-        file_handle: ShellFileHandle,
-        size: *mut Uint64,
-    ) -> Status,
+    pub get_file_size:
+        unsafe extern "efiapi" fn(file_handle: ShellFileHandle, size: *mut Uint64) -> Status,
     pub open_root: unsafe extern "efiapi" fn(
         device_handle: Handle,
         file_handle: *mut ShellFileHandle,
@@ -221,10 +204,8 @@ pub struct ShellProtocol {
         file_handle: *mut ShellFileHandle,
     ) -> Status,
     pub execute_in_shell: *mut core::ffi::c_void, // Reserved
-    pub get_env_ex: unsafe extern "efiapi" fn(
-        name: *const Char16,
-        attributes: *mut Uint32,
-    ) -> *const Char16,
+    pub get_env_ex:
+        unsafe extern "efiapi" fn(name: *const Char16, attributes: *mut Uint32) -> *const Char16,
 }
 
 /// EFI_SHELL_PARAMETERS_PROTOCOL
@@ -293,11 +274,7 @@ impl ShellProtocol {
     }
 
     /// Set current directory
-    pub unsafe fn set_cur_dir(
-        &mut self,
-        filesystem: Option<&[u16]>,
-        dir: &[u16],
-    ) -> Status {
+    pub unsafe fn set_cur_dir(&mut self, filesystem: Option<&[u16]>, dir: &[u16]) -> Status {
         let fs_ptr = filesystem
             .map(|s| s.as_ptr() as *const _)
             .unwrap_or(core::ptr::null());
@@ -311,8 +288,7 @@ impl ShellProtocol {
         mode: Uint64,
     ) -> Result<ShellFileHandle, Status> {
         let mut handle: ShellFileHandle = core::ptr::null_mut();
-        let status =
-            (self.open_file_by_name)(filename.as_ptr() as *const _, &mut handle, mode);
+        let status = (self.open_file_by_name)(filename.as_ptr() as *const _, &mut handle, mode);
 
         if status == EFI_SUCCESS {
             Ok(handle)
@@ -432,6 +408,6 @@ mod tests {
     fn test_file_modes() {
         assert_eq!(EFI_FILE_MODE_READ, 0x01);
         assert_eq!(EFI_FILE_MODE_WRITE, 0x02);
-        assert!(EFI_FILE_MODE_CREATE > 0);
+        assert_ne!(EFI_FILE_MODE_CREATE, 0);
     }
 }

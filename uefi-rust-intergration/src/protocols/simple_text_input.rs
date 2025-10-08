@@ -26,10 +26,8 @@ pub struct SimpleTextInputProtocol {
         this: *mut SimpleTextInputProtocol,
         extended_verification: Boolean,
     ) -> Status,
-    pub read_key_stroke: unsafe extern "efiapi" fn(
-        this: *mut SimpleTextInputProtocol,
-        key: *mut InputKey,
-    ) -> Status,
+    pub read_key_stroke:
+        unsafe extern "efiapi" fn(this: *mut SimpleTextInputProtocol, key: *mut InputKey) -> Status,
     pub wait_for_key: Event,
 }
 

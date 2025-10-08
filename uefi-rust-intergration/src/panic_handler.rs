@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //! Enhanced UEFI Panic Handler with Console Output
 
+#[cfg(not(test))]
 use crate::ffi::*;
+#[cfg(not(test))]
 use crate::protocols::SimpleTextOutputProtocol;
+#[cfg(all(not(test), not(feature = "std")))]
 use core::panic::PanicInfo;
-use core::fmt::Write;
+
+#[cfg(test)]
+use crate::protocols::SimpleTextOutputProtocol;
 
 static mut CONSOLE_OUT: Option<*mut SimpleTextOutputProtocol> = None;
 
@@ -16,11 +21,14 @@ pub unsafe fn init_panic_handler(console: *mut SimpleTextOutputProtocol) {
     CONSOLE_OUT = Some(console);
 }
 
+#[cfg(not(test))]
+#[allow(dead_code)]
 struct PanicWriter {
     console: *mut SimpleTextOutputProtocol,
 }
 
-impl Write for PanicWriter {
+#[cfg(not(test))]
+impl core::fmt::Write for PanicWriter {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         #[cfg(not(feature = "std"))]
         use alloc::vec::Vec;

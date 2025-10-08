@@ -155,15 +155,11 @@ pub struct PxeMtftpInfo {
 #[repr(C)]
 pub struct PxeBaseCodeProtocol {
     pub revision: Uint64,
-    pub start: unsafe extern "efiapi" fn(
-        this: *mut PxeBaseCodeProtocol,
-        use_ipv6: Boolean,
-    ) -> Status,
+    pub start:
+        unsafe extern "efiapi" fn(this: *mut PxeBaseCodeProtocol, use_ipv6: Boolean) -> Status,
     pub stop: unsafe extern "efiapi" fn(this: *mut PxeBaseCodeProtocol) -> Status,
-    pub dhcp: unsafe extern "efiapi" fn(
-        this: *mut PxeBaseCodeProtocol,
-        sort_offers: Boolean,
-    ) -> Status,
+    pub dhcp:
+        unsafe extern "efiapi" fn(this: *mut PxeBaseCodeProtocol, sort_offers: Boolean) -> Status,
     pub discover: unsafe extern "efiapi" fn(
         this: *mut PxeBaseCodeProtocol,
         boot_type: Uint16,
@@ -311,9 +307,7 @@ impl PxeBaseCodeProtocol {
         layer: Option<&mut u16>,
         bis_reply: bool,
     ) -> Status {
-        let layer_ptr = layer
-            .map(|l| l as *mut _)
-            .unwrap_or(core::ptr::null_mut());
+        let layer_ptr = layer.map(|l| l as *mut _).unwrap_or(core::ptr::null_mut());
         (self.discover)(
             self,
             boot_type,

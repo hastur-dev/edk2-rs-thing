@@ -86,12 +86,8 @@ pub struct SimpleNetworkMode {
 #[repr(C)]
 pub struct SimpleNetworkProtocol {
     pub revision: Uint64,
-    pub start: unsafe extern "efiapi" fn(
-        this: *mut SimpleNetworkProtocol,
-    ) -> Status,
-    pub stop: unsafe extern "efiapi" fn(
-        this: *mut SimpleNetworkProtocol,
-    ) -> Status,
+    pub start: unsafe extern "efiapi" fn(this: *mut SimpleNetworkProtocol) -> Status,
+    pub stop: unsafe extern "efiapi" fn(this: *mut SimpleNetworkProtocol) -> Status,
     pub initialize: unsafe extern "efiapi" fn(
         this: *mut SimpleNetworkProtocol,
         extra_rx_buffer_size: Uintn,
@@ -101,9 +97,7 @@ pub struct SimpleNetworkProtocol {
         this: *mut SimpleNetworkProtocol,
         extended_verification: Boolean,
     ) -> Status,
-    pub shutdown: unsafe extern "efiapi" fn(
-        this: *mut SimpleNetworkProtocol,
-    ) -> Status,
+    pub shutdown: unsafe extern "efiapi" fn(this: *mut SimpleNetworkProtocol) -> Status,
     pub receive_filters: unsafe extern "efiapi" fn(
         this: *mut SimpleNetworkProtocol,
         enable: Uint32,
@@ -212,7 +206,9 @@ impl SimpleNetworkProtocol {
     ) -> Status {
         let src_ptr = src_addr.map_or(core::ptr::null(), |a| a as *const _);
         let dest_ptr = dest_addr.map_or(core::ptr::null(), |a| a as *const _);
-        let proto_ptr = protocol.as_ref().map_or(core::ptr::null(), |p| p as *const _);
+        let proto_ptr = protocol
+            .as_ref()
+            .map_or(core::ptr::null(), |p| p as *const _);
 
         (self.transmit)(
             self,
